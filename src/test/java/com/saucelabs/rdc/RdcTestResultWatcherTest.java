@@ -4,12 +4,14 @@ import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileElement;
 import io.appium.java_client.android.AndroidDriver;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+@Ignore
 public class RdcTestResultWatcherTest {
 
 	@Rule
@@ -19,7 +21,7 @@ public class RdcTestResultWatcherTest {
 	@Before
 	public void setup() {
 		DesiredCapabilities capabilities = new DesiredCapabilities();
-		capabilities.setCapability(RdcCapabilities.API_KEY, "A9899CF462D84C22A51F6722A9417853");
+		capabilities.setCapability(RdcCapabilities.API_KEY, "Your project API key");
 
 		driver = new AndroidDriver(RdcEndpoints.EU_ENDPOINT, capabilities);
 		watcher.setRemoteWebDriver(driver);
