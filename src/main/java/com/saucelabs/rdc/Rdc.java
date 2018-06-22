@@ -5,18 +5,17 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.concurrent.TimeUnit;
 
-import static com.saucelabs.rdc.RdcEndpoints.DEFAULT_API_ENDPOINT;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static java.util.concurrent.TimeUnit.MINUTES;
 
 @Retention(RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Rdc {
-	String apiKey();
+	String apiKey() default "";
 
 	long suiteId();
 
-	String apiUrl() default DEFAULT_API_ENDPOINT;
+	String apiUrl() default "https://app.testobject.com/api";
 
 	long appId() default -1;
 

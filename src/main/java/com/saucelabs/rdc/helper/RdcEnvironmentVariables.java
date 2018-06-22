@@ -1,7 +1,10 @@
 package com.saucelabs.rdc.helper;
 
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.concurrent.TimeUnit;
+
+import static java.lang.Long.parseLong;
 
 public class RdcEnvironmentVariables {
 	private static final String API_KEY = "API_KEY";
@@ -24,8 +27,13 @@ public class RdcEnvironmentVariables {
 		return Optional.ofNullable(System.getenv(API_URL));
 	}
 
-	public static Optional<Long> getAppId() {
-		return Optional.ofNullable(System.getenv(APP_ID)).map(Long::valueOf);
+	public static OptionalLong getAppId() {
+		String appId = System.getenv(APP_ID);
+		if (appId == null) {
+			return OptionalLong.empty();
+		} else {
+			return OptionalLong.of(parseLong(appId));
+		}
 	}
 
 	public static Optional<Integer> getTimeout() {

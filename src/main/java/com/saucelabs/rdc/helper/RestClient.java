@@ -16,6 +16,8 @@ import java.io.Closeable;
 import java.net.URI;
 import java.util.Optional;
 
+import static java.util.Locale.US;
+
 public class RestClient implements Closeable {
 
 	private final Client client;
@@ -47,7 +49,7 @@ public class RestClient implements Closeable {
 		}
 
 		private static void addProxyConfiguration(ClientConfig config, String baseUrl) {
-			String protocol = URI.create(baseUrl).getScheme().toLowerCase();
+			String protocol = URI.create(baseUrl).getScheme().toLowerCase(US);
 
 			Optional<String> proxyHost = Optional.ofNullable(System.getProperty(protocol + ".proxyHost"));
 			if (!proxyHost.isPresent()) {
