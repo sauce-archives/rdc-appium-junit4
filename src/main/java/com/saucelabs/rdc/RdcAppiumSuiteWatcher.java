@@ -18,7 +18,7 @@ public class RdcAppiumSuiteWatcher extends TestWatcher {
 	private String apiKey;
 	private RdcTest test;
 	private boolean isLocalTest;
-	private URL appiumURL;
+	private URL appiumUrl;
 	private URL apiUrl;
 
 	private SuiteReporter reporter;
@@ -59,18 +59,18 @@ public class RdcAppiumSuiteWatcher extends TestWatcher {
 	}
 
 	public void setRemoteWebDriver(RemoteWebDriver driver) {
-		provider.setApiURL(apiUrl);
+		provider.setApiUrl(apiUrl);
 		provider.setDriver(driver);
 		reporter.setProvider(provider);
 	}
 
-	public void configure(String apiKey, long suiteId, SuiteReport suiteReport, boolean isLocalTest, URL appiumURL, URL apiUrl) {
+	public void configure(String apiKey, long suiteId, SuiteReport suiteReport, boolean isLocalTest, URL appiumUrl, URL apiUrl) {
 		reporter = new SuiteReporter();
 		setApiKey(apiKey);
 		setSuiteId(suiteId);
 		setSuiteReport(suiteReport);
 		setIsLocalTest(isLocalTest);
-		setAppiumURL(appiumURL);
+		setAppiumUrl(appiumUrl);
 		setApiUrl(apiUrl);
 	}
 
@@ -78,8 +78,8 @@ public class RdcAppiumSuiteWatcher extends TestWatcher {
 		reporter.setSuiteId(suiteId);
 	}
 
-	public void setAppiumURL(URL appiumURL) {
-		this.appiumURL = appiumURL;
+	public void setAppiumUrl(URL appiumUrl) {
+		this.appiumUrl = appiumUrl;
 	}
 
 	public void setApiUrl(URL apiUrl) {
@@ -113,7 +113,7 @@ public class RdcAppiumSuiteWatcher extends TestWatcher {
 		this.apiKey = apiKey;
 	}
 
-	public URL getAppiumEndpointURL() {
+	public URL getAppiumEndpointUrl() {
 		if (isLocalTest) {
 			try {
 				return new URL("http://0.0.0.0:4723/wd/hub");
@@ -121,7 +121,7 @@ public class RdcAppiumSuiteWatcher extends TestWatcher {
 				throw new RuntimeException(e.getMessage(), e);
 			}
 		} else {
-			return appiumURL;
+			return appiumUrl;
 		}
 	}
 }

@@ -9,7 +9,7 @@ public class RdcListenerProvider {
 
 	private RemoteWebDriver remoteWebDriver;
 
-	private URL apiURL;
+	private URL apiUrl;
 
 	private boolean isLocalTest = false;
 
@@ -32,12 +32,12 @@ public class RdcListenerProvider {
 		this.remoteWebDriver = driver;
 	}
 
-	public void setApiURL(URL apiURL) {
-		this.apiURL = apiURL;
+	public URL getApiUrl() {
+		return apiUrl;
 	}
 
-	public URL getApiUrl() {
-		return apiURL;
+	public void setApiUrl(URL apiUrl) {
+		this.apiUrl = apiUrl;
 	}
 
 	public boolean isLocalTest() {

@@ -10,8 +10,9 @@ import javax.ws.rs.core.Response;
 
 import static com.saucelabs.rdc.RdcCapabilities.API_KEY;
 import static com.saucelabs.rdc.RdcEndpoints.APPIUM_REST_PATH;
+import static java.util.Objects.requireNonNull;
 
-public abstract class ResultReporter {
+public class ResultReporter {
 
 	protected RestClient client;
 
@@ -49,9 +50,12 @@ public abstract class ResultReporter {
 
 	public void createSuiteReportAndTestReport(boolean passed) {
 		AppiumSessionResource appiumSessionResource = new AppiumSessionResource(client);
-		Response response = appiumSessionResource.updateTestReportStatus(provider.getRemoteWebDriver().getSessionId().toString(), passed);
+		RemoteWebDriver remoteWebDriver = requireNonNull(
+				provider.getRemoteWebDriver(),
+				"The WebDriver instance is not set.");
+		Response response = appiumSessionResource.updateTestReportStatus(remoteWebDriver.getSessionId().toString(), passed);
 		if (response.getStatus() != 204) {
-			System.out.println("RdcTest result might not be updated on Sauce Labs RDC (TestObject). Status: " + response.getStatus());
+			System.out.println("Test report status might not be updated on Sauce Labs RDC (TestObject). Status: " + response.getStatus());
 		}
 	}
 

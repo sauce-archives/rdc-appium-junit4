@@ -2,7 +2,7 @@ package com.saucelabs.rdc;
 
 import com.saucelabs.rdc.helper.RdcEnvironmentVariables;
 import com.saucelabs.rdc.helper.RdcListenerProvider;
-import com.saucelabs.rdc.helper.reporter.IntermediateReporter;
+import com.saucelabs.rdc.helper.reporter.ResultReporter;
 import org.junit.AssumptionViolatedException;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -15,7 +15,7 @@ import static com.saucelabs.rdc.RdcEndpoints.DEFAULT_API_ENDPOINT;
 
 public class RdcTestResultWatcher extends TestWatcher {
 
-	private IntermediateReporter reporter;
+	private ResultReporter reporter;
 
 	private RdcListenerProvider provider;
 
@@ -25,22 +25,22 @@ public class RdcTestResultWatcher extends TestWatcher {
 
 	@Override
 	protected void succeeded(Description description) {
-		reporter.processAndReportResult(true);
+		reporter.createSuiteReportAndTestReport(true);
 	}
 
 	@Override
 	protected void failed(Throwable e, Description description) {
-		reporter.processAndReportResult(false);
+		reporter.createSuiteReportAndTestReport(false);
 	}
 
 	@Override
 	protected void skipped(AssumptionViolatedException e, Description description) {
-		reporter.processAndReportResult(false);
+		reporter.createSuiteReportAndTestReport(false);
 	}
 
 	@Override
 	protected void skipped(org.junit.internal.AssumptionViolatedException e, Description description) {
-		reporter.processAndReportResult(false);
+		reporter.createSuiteReportAndTestReport(false);
 	}
 
 	@Override
@@ -51,17 +51,17 @@ public class RdcTestResultWatcher extends TestWatcher {
 	public void setRemoteWebDriver(RemoteWebDriver driver) {
 		setApiUrl();
 		provider.setDriver(driver);
-		reporter = new IntermediateReporter(provider);
+		reporter = new ResultReporter(provider);
 	}
 
 	private void setApiUrl() {
-		URL apiURL;
+		URL apiUrl;
 		try {
-			apiURL = new URL(RdcEnvironmentVariables.getApiEndpoint().orElse(DEFAULT_API_ENDPOINT));
+			apiUrl = new URL(RdcEnvironmentVariables.getApiEndpoint().orElse(DEFAULT_API_ENDPOINT));
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
-		provider.setApiURL(apiURL);
+		provider.setApiUrl(apiUrl);
 	}
 
 	public void setIsLocalTest(boolean isLocalTest) {
