@@ -55,13 +55,13 @@ public class RdcTestResultWatcher extends TestWatcher {
 	}
 
 	private void setApiUrl() {
-		URL apiURL;
+		URL apiUrl;
 		try {
-			apiURL = new URL(RdcEnvironmentVariables.getApiEndpoint().orElse(DEFAULT_API_ENDPOINT));
+			apiUrl = new URL(RdcEnvironmentVariables.getApiEndpoint().orElse(DEFAULT_API_ENDPOINT));
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
-		provider.setApiURL(apiURL);
+		provider.setApiUrl(apiUrl);
 	}
 
 	public void setIsLocalTest(boolean isLocalTest) {

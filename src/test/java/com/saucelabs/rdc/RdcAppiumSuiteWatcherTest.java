@@ -11,7 +11,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 @Ignore
 @RunWith(RdcAppiumSuite.class)
-@Rdc(apiKey = "Your project API key", suiteId = 1)
+@Rdc(apiKey = "7CDE94EFFE3E4EF4A773DB2728688C53", suiteId = 61)
 public class RdcAppiumSuiteWatcherTest {
 
 	@Rule
@@ -24,7 +24,7 @@ public class RdcAppiumSuiteWatcherTest {
 		capabilities.setCapability(RdcCapabilities.API_KEY, watcher.getApiKey());
 		capabilities.setCapability(RdcCapabilities.TESTOBJECT_TEST_REPORT_ID, watcher.getTestReportId());
 
-		driver = new AndroidDriver(watcher.getAppiumEndpointURL(), capabilities);
+		driver = new AndroidDriver(watcher.getAppiumEndpointUrl(), capabilities);
 		watcher.setRemoteWebDriver(driver);
 
 		printUsefulLinks();

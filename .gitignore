@@ -16,3 +16,4 @@ buildNumber.properties
 .idea/
 classes/
 rdc-appium-junit4.iml
+.flattened-pom.xml

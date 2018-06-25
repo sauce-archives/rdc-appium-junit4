@@ -166,10 +166,10 @@ public class RdcAppiumSuite extends Suite {
 		}
 		List<Runner> runners = new LinkedList<>();
 		for (DataCenterSuite dataCenterSuite : dataCenterSuites) {
-			URL appiumURL = dataCenterSuite.getDataCenterURL();
+			URL appiumUrl = dataCenterSuite.getDataCenterUrl();
 			String dataCenterId = dataCenterSuite.dataCenterId;
 			for (String deviceId : dataCenterSuite.getDeviceDescriptorIds()) {
-				runners.add(new PerDeviceRunner(clazz, deviceId, dataCenterId, appiumURL, apiUrl));
+				runners.add(new PerDeviceRunner(clazz, deviceId, dataCenterId, appiumUrl, apiUrl));
 			}
 		}
 
@@ -217,12 +217,12 @@ public class RdcAppiumSuite extends Suite {
 		private final URL appiumUrl;
 		private final URL apiUrl;
 
-		public PerDeviceRunner(Class<?> clazz, String deviceId, String dataCenterId, URL appiumUrl, URL apiURL) throws InitializationError {
+		public PerDeviceRunner(Class<?> clazz, String deviceId, String dataCenterId, URL appiumUrl, URL apiUrl) throws InitializationError {
 			super(clazz);
 			this.deviceId = deviceId;
 			this.dataCenterId = dataCenterId;
 			this.appiumUrl = appiumUrl;
-			this.apiUrl = apiURL;
+			this.apiUrl = apiUrl;
 		}
 
 		@Override

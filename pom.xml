@@ -1,15 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.github.stefanbirkner</groupId>
+        <artifactId>lib-parent</artifactId>
+        <version>16</version>
+    </parent>
+
     <groupId>com.saucelabs</groupId>
     <artifactId>rdc-appium-junit4</artifactId>
-    <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
     <name>RDC Appium Junit4</name>
     <description>Library for running Appium test suites and updating test status on Sauce Labs RDC</description>
     <url>https://github.com/saucelabs/rdc-appium-junit4</url>
-
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -36,6 +43,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <findbugs.excludeFilterFile>findbugs-exclude.xml</findbugs.excludeFilterFile>
     </properties>
 
     <dependencies>
