@@ -51,7 +51,7 @@ public abstract class ResultReporter {
 		AppiumSessionResource appiumSessionResource = new AppiumSessionResource(client);
 		Response response = appiumSessionResource.updateTestReportStatus(provider.getRemoteWebDriver().getSessionId().toString(), passed);
 		if (response.getStatus() != 204) {
-			System.out.println("RdcTest result might not be updated on Sauce Labs RDC (TestObject). Status: " + response.getStatus());
+			System.out.println("Test report status might not be updated on Sauce Labs RDC (TestObject). Status: " + response.getStatus());
 		}
 	}
 

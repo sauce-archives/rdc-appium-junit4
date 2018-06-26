@@ -22,7 +22,7 @@ public class RdcAppiumSuiteWatcherTest {
 	public void setup() {
 		DesiredCapabilities capabilities = new DesiredCapabilities();
 		capabilities.setCapability(RdcCapabilities.API_KEY, watcher.getApiKey());
-		capabilities.setCapability(RdcCapabilities.TESTOBJECT_TEST_REPORT_ID, watcher.getTestReportId());
+		capabilities.setCapability(RdcCapabilities.TEST_REPORT_ID, watcher.getTestReportId());
 
 		driver = new AndroidDriver(watcher.getAppiumEndpointUrl(), capabilities);
 		watcher.setRemoteWebDriver(driver);
