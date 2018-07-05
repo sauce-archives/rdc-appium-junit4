@@ -25,27 +25,35 @@ public class RdcTestResultWatcher extends TestWatcher {
 
 	@Override
 	protected void succeeded(Description description) {
-		reporter.createSuiteReportAndTestReport(true);
+		reportStatus(true);
 	}
 
 	@Override
 	protected void failed(Throwable e, Description description) {
-		reporter.createSuiteReportAndTestReport(false);
+		reportStatus(false);
 	}
 
 	@Override
 	protected void skipped(AssumptionViolatedException e, Description description) {
-		reporter.createSuiteReportAndTestReport(false);
+		reportStatus(false);
 	}
 
 	@Override
 	protected void skipped(org.junit.internal.AssumptionViolatedException e, Description description) {
-		reporter.createSuiteReportAndTestReport(false);
+		reportStatus(false);
+	}
+
+	private void reportStatus(boolean status) {
+		if (reporter != null) {
+			reporter.createSuiteReportAndTestReport(status);
+		}
 	}
 
 	@Override
 	protected void finished(Description description) {
-		reporter.close();
+		if (reporter != null) {
+			reporter.close();
+		}
 	}
 
 	public void setRemoteWebDriver(RemoteWebDriver driver) {
