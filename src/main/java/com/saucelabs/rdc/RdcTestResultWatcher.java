@@ -71,8 +71,4 @@ public class RdcTestResultWatcher extends TestWatcher {
 		}
 		provider.setApiUrl(apiUrl);
 	}
-
-	public void setIsLocalTest(boolean isLocalTest) {
-		provider.setLocalTest(isLocalTest);
-	}
 }
