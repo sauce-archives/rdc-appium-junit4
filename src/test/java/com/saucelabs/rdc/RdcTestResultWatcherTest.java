@@ -10,6 +10,7 @@ import org.junit.internal.AssumptionViolatedException;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.RunWith;
+import org.junit.runner.notification.Failure;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
@@ -17,6 +18,8 @@ import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
+
+import java.util.Objects;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
@@ -140,6 +143,17 @@ public class RdcTestResultWatcherTest {
 	}
 
 	@Test
+	public void doesNotFailBecauseWebDriverIsNotSet() {
+		TestClass.setWebDriver = false;
+		serverSendsResponse(204);
+		webDriverHasArbitrarySessionId();
+
+		Result result = runTest();
+
+		assertNoUnexpectedException(result);
+	}
+
+	@Test
 	public void writesErrorWhenServerReturnsWrongStatus() {
 		TestClass.setWebDriver = true;
 		serverSendsResponse(500);
@@ -190,6 +204,16 @@ public class RdcTestResultWatcherTest {
 	private String bodyOfRequest() {
 		ServeEvent serveEvent = wireMockRule.getAllServeEvents().get(0);
 		return serveEvent.getRequest().getBodyAsString();
+	}
+
+	private void assertNoUnexpectedException(Result result) {
+		for (Failure failure: result.getFailures()) {
+			Throwable exception = failure.getException();
+			if (!Objects.equals(exception.getMessage(), "expected")) {
+				throw new AssertionError(
+					"An unexpected exception was thrown.", exception);
+			}
+		}
 	}
 
 	public static class TestClass {
