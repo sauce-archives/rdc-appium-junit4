@@ -69,9 +69,6 @@ public class RdcTestResultWatcherTest {
 
 ## Release Guide
 
-Every commit to the master branch of this library is published to Maven Central
-by Travis CI.
-
 #### General information about working with GPG files
 
 You need a gpg key to sign the library in order to deploy it.
@@ -87,7 +84,7 @@ First you need to make sure you have `gpg` installed. _GPG behaviours may differ
 * You should only push encrypted files to GitHub.
 
 
-Afterwards you need to decrypt the files, use them to sign the library and then deploy to Maven central.
+Afterwards you need to use the decrypted files to sign the library in order to deploy it to Maven central.
 
 ### Deploying to Sonatype
 
