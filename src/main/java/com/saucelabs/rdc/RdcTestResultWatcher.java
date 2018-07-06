@@ -45,7 +45,13 @@ public class RdcTestResultWatcher extends TestWatcher {
 
 	private void reportStatus(boolean status) {
 		if (reporter != null) {
-			reporter.createSuiteReportAndTestReport(status);
+			try {
+				reporter.createSuiteReportAndTestReport(status);
+			} catch (Exception e) {
+				System.err.println(
+					"Failed to update test report. Caused by "
+						+ e.getLocalizedMessage());
+			}
 		}
 	}
 

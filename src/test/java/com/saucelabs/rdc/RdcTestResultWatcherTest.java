@@ -26,6 +26,7 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
 import static com.saucelabs.rdc.RdcCapabilities.API_KEY;
 import static java.util.UUID.randomUUID;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
@@ -96,6 +97,7 @@ public class RdcTestResultWatcherTest {
 		TestClass.setWebDriver = true;
 		serverSendsResponse(204);
 		webDriverHasArbitrarySessionId();
+		wireMockServerIsApiServer();
 
 		runTest();
 
@@ -109,6 +111,7 @@ public class RdcTestResultWatcherTest {
 		TestClass.setWebDriver = true;
 		serverSendsResponse(204);
 		webDriverHasArbitrarySessionId();
+		wireMockServerIsApiServer();
 
 		runTest();
 
@@ -121,6 +124,7 @@ public class RdcTestResultWatcherTest {
 		serverSendsResponse(204);
 		SessionId sessionId = randomSessionId();
 		webDriverHasSessionId(sessionId);
+		wireMockServerIsApiServer();
 
 		runTest();
 
@@ -134,6 +138,7 @@ public class RdcTestResultWatcherTest {
 		TestClass.setWebDriver = true;
 		serverSendsResponse(204);
 		webDriverHasArbitrarySessionId();
+		wireMockServerIsApiServer();
 
 		runTest();
 
@@ -147,6 +152,7 @@ public class RdcTestResultWatcherTest {
 		TestClass.setWebDriver = false;
 		serverSendsResponse(204);
 		webDriverHasArbitrarySessionId();
+		wireMockServerIsApiServer();
 
 		Result result = runTest();
 
@@ -154,10 +160,39 @@ public class RdcTestResultWatcherTest {
 	}
 
 	@Test
+	public void doesNotFailWhenApiUrlIsWrong() {
+		TestClass.setWebDriver = true;
+		serverSendsResponse(204);
+		webDriverHasArbitrarySessionId();
+		wireMockServerIsApiServer();
+		environmentVariables.set("API_URL", "http://127.0.0.1:38346");
+
+		Result result = runTest();
+
+		assertNoUnexpectedException(result);
+	}
+
+	@Test
+	public void writesErrorWhenApiUrlIsWrong() {
+		TestClass.setWebDriver = true;
+		serverSendsResponse(204);
+		webDriverHasArbitrarySessionId();
+		wireMockServerIsApiServer();
+		environmentVariables.set("API_URL", "http://127.0.0.1:38346");
+
+		runTest();
+
+		assertTrue(
+			systemErr.getLogWithNormalizedLineSeparator()
+				.startsWith("Failed to update test report."));
+	}
+
+	@Test
 	public void writesErrorWhenServerReturnsWrongStatus() {
 		TestClass.setWebDriver = true;
 		serverSendsResponse(500);
 		webDriverHasArbitrarySessionId();
+		wireMockServerIsApiServer();
 
 		runTest();
 
@@ -181,14 +216,16 @@ public class RdcTestResultWatcherTest {
 			.thenReturn(id);
 	}
 
+	private void wireMockServerIsApiServer() {
+		environmentVariables.set(
+			"API_URL", "http://127.0.0.1:" + wireMockRule.port());
+	}
+
 	private SessionId randomSessionId() {
 		return new SessionId(randomUUID().toString());
 	}
 
-
 	private Result runTest() {
-		environmentVariables.set(
-			"API_URL", "http://127.0.0.1:" + wireMockRule.port());
 		TestClass.test = test;
 		when(TestClass.webDriver.getCapabilities())
 			.thenReturn(capabilitiesWithApiKey("dummy-api-key"));
