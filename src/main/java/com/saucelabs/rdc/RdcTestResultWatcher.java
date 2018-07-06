@@ -3,9 +3,9 @@ package com.saucelabs.rdc;
 import com.saucelabs.rdc.helper.RdcEnvironmentVariables;
 import com.saucelabs.rdc.helper.RdcListenerProvider;
 import com.saucelabs.rdc.helper.reporter.ResultReporter;
-import org.junit.AssumptionViolatedException;
-import org.junit.rules.TestWatcher;
+import org.junit.rules.TestRule;
 import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.net.MalformedURLException;
@@ -13,7 +13,7 @@ import java.net.URL;
 
 import static com.saucelabs.rdc.RdcEndpoints.DEFAULT_API_ENDPOINT;
 
-public class RdcTestResultWatcher extends TestWatcher {
+public class RdcTestResultWatcher implements TestRule {
 
 	private ResultReporter reporter;
 
@@ -24,23 +24,21 @@ public class RdcTestResultWatcher extends TestWatcher {
 	}
 
 	@Override
-	protected void succeeded(Description description) {
-		reportStatus(true);
-	}
-
-	@Override
-	protected void failed(Throwable e, Description description) {
-		reportStatus(false);
-	}
-
-	@Override
-	protected void skipped(AssumptionViolatedException e, Description description) {
-		reportStatus(false);
-	}
-
-	@Override
-	protected void skipped(org.junit.internal.AssumptionViolatedException e, Description description) {
-		reportStatus(false);
+	public Statement apply(final Statement base, final Description description) {
+		return new Statement() {
+			@Override
+			public void evaluate() throws Throwable {
+				try {
+					base.evaluate();
+					reportStatus(true);
+				} catch (Throwable e) {
+					reportStatus(false);
+					throw e;
+				} finally {
+					closeReporter();
+				}
+			}
+		};
 	}
 
 	private void reportStatus(boolean status) {
@@ -55,8 +53,7 @@ public class RdcTestResultWatcher extends TestWatcher {
 		}
 	}
 
-	@Override
-	protected void finished(Description description) {
+	private void closeReporter() {
 		if (reporter != null) {
 			reporter.close();
 		}
