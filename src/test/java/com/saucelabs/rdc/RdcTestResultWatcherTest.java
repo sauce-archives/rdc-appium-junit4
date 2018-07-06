@@ -5,7 +5,7 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
 import org.junit.*;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
-import org.junit.contrib.java.lang.system.SystemOutRule;
+import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.internal.AssumptionViolatedException;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
@@ -86,8 +86,8 @@ public class RdcTestResultWatcherTest {
 		= new EnvironmentVariables();
 
 	@Rule
-	public final SystemOutRule systemOut
-		= new SystemOutRule().enableLog().mute();
+	public final SystemErrRule systemErr
+		= new SystemErrRule().enableLog().mute();
 
 	@Test
 	public void isReportedAsPassed() {
@@ -163,7 +163,7 @@ public class RdcTestResultWatcherTest {
 
 		assertEquals(
 			"Test report status might not be updated on Sauce Labs RDC (TestObject). Status: 500\n",
-			systemOut.getLogWithNormalizedLineSeparator());
+			systemErr.getLogWithNormalizedLineSeparator());
 	}
 
 	private void serverSendsResponse(int status) {

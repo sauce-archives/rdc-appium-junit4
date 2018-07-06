@@ -55,7 +55,7 @@ public class ResultReporter {
 				"The WebDriver instance is not set.");
 		Response response = appiumSessionResource.updateTestReportStatus(remoteWebDriver.getSessionId().toString(), passed);
 		if (response.getStatus() != 204) {
-			System.out.println("Test report status might not be updated on Sauce Labs RDC (TestObject). Status: " + response.getStatus());
+			System.err.println("Test report status might not be updated on Sauce Labs RDC (TestObject). Status: " + response.getStatus());
 		}
 	}
 
