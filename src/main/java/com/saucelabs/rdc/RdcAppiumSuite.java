@@ -28,10 +28,11 @@ import java.util.concurrent.TimeUnit;
 
 import static com.saucelabs.rdc.RdcEndpoints.APPIUM_REST_PATH;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 
 public class RdcAppiumSuite extends Suite {
 	private static final List<Runner> NO_RUNNERS = emptyList();
-	private List<Runner> perDeviceRunners = new LinkedList<>();
+	private final List<Runner> perDeviceRunners;
 	private RestClient client;
 
 	private String apiKey;
@@ -49,7 +50,8 @@ public class RdcAppiumSuite extends Suite {
 		isTestingLocally = isTestingLocally(rdcAnnotation);
 
 		if (isTestingLocally) {
-			perDeviceRunners.add(new PerDeviceRunner(clazz, null, null, null, null));
+			perDeviceRunners = singletonList(
+				new PerDeviceRunner(clazz, null, null, null, null));
 		} else {
 			apiKey = getApiKey(rdcAnnotation);
 			suiteId = getSuiteId(rdcAnnotation);
