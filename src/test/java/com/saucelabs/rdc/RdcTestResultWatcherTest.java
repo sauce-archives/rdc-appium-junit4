@@ -1,8 +1,5 @@
 package com.saucelabs.rdc;
 
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-
-import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
 import org.junit.*;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.contrib.java.lang.system.SystemErrRule;
@@ -22,7 +19,6 @@ import org.openqa.selenium.remote.SessionId;
 import java.util.Objects;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static com.saucelabs.rdc.RdcCapabilities.API_KEY;
 import static java.util.UUID.randomUUID;
 import static org.junit.Assert.assertEquals;
@@ -79,8 +75,8 @@ public class RdcTestResultWatcherTest {
 	public boolean expectedToPass;
 
 	@Rule
-	public final WireMockRule wireMockRule
-		= new WireMockRule(options().dynamicPort());
+	public final FakeSaucelabsServer saucelabsServer
+		= new FakeSaucelabsServer();
 
 	@Rule
 	public final EnvironmentVariables environmentVariables
@@ -101,7 +97,7 @@ public class RdcTestResultWatcherTest {
 
 		runTest();
 
-		assertEquals("{\"passed\":true}", bodyOfRequest());
+		assertEquals("{\"passed\":true}", saucelabsServer.bodyOfLastRequest());
 	}
 
 	@Test
@@ -115,7 +111,7 @@ public class RdcTestResultWatcherTest {
 
 		runTest();
 
-		assertEquals("{\"passed\":false}", bodyOfRequest());
+		assertEquals("{\"passed\":false}", saucelabsServer.bodyOfLastRequest());
 	}
 
 	@Test
@@ -128,7 +124,7 @@ public class RdcTestResultWatcherTest {
 
 		runTest();
 
-		wireMockRule.verify(
+		saucelabsServer.verify(
 			putRequestedFor(
 				urlEqualTo("/rest/v2/appium/session/" + sessionId + "/test")));
 	}
@@ -142,7 +138,7 @@ public class RdcTestResultWatcherTest {
 
 		runTest();
 
-		wireMockRule.verify(
+		saucelabsServer.verify(
 			putRequestedFor(anyUrl())
 				.withHeader("Accept", equalTo("application/json")));
 	}
@@ -202,7 +198,7 @@ public class RdcTestResultWatcherTest {
 	}
 
 	private void serverSendsResponse(int status) {
-		wireMockRule.stubFor(
+		saucelabsServer.stubFor(
 			put(anyUrl()).willReturn(aResponse().withStatus(status)));
 	}
 
@@ -218,7 +214,7 @@ public class RdcTestResultWatcherTest {
 
 	private void wireMockServerIsApiServer() {
 		environmentVariables.set(
-			"API_URL", "http://127.0.0.1:" + wireMockRule.port());
+			"API_URL", "http://127.0.0.1:" + saucelabsServer.port());
 	}
 
 	private SessionId randomSessionId() {
@@ -238,11 +234,6 @@ public class RdcTestResultWatcherTest {
 		return capabilities;
 	}
 
-	private String bodyOfRequest() {
-		ServeEvent serveEvent = wireMockRule.getAllServeEvents().get(0);
-		return serveEvent.getRequest().getBodyAsString();
-	}
-
 	private void assertNoUnexpectedException(Result result) {
 		for (Failure failure: result.getFailures()) {
 			Throwable exception = failure.getException();
@@ -259,7 +250,7 @@ public class RdcTestResultWatcherTest {
 		public RdcTestResultWatcher watcher = new RdcTestResultWatcher();
 
 		static boolean setWebDriver = false;
-		static RemoteWebDriver webDriver = mock(RemoteWebDriver.class);
+		static final RemoteWebDriver webDriver = mock(RemoteWebDriver.class);
 
 		static Runnable test; //used to inject the test itself
 
