@@ -10,19 +10,12 @@ import java.util.OptionalInt;
 
 public class SuiteReporter extends ResultReporter {
 
-	private SuiteReport suiteReport;
+	private final SuiteReport suiteReport;
+	private final long suiteId;
 
-	private long suiteId;
-
-	public SuiteReporter() {
-	}
-
-	public void setSuiteReport(SuiteReport suiteReport) {
-		this.suiteReport = suiteReport;
-	}
-
-	public void setSuiteId(long suiteId) {
+	public SuiteReporter(long suiteId, SuiteReport suiteReport) {
 		this.suiteId = suiteId;
+		this.suiteReport = suiteReport;
 	}
 
 	public void processAndReportResult(boolean passed, RdcTest test) {

@@ -66,17 +66,11 @@ public class RdcAppiumSuiteWatcher extends TestWatcher {
 	}
 
 	public void configure(String apiKey, long suiteId, SuiteReport suiteReport, boolean isLocalTest, URL appiumUrl, URL apiUrl) {
-		reporter = new SuiteReporter();
+		reporter = new SuiteReporter(suiteId, suiteReport);
 		setApiKey(apiKey);
-		setSuiteId(suiteId);
-		setSuiteReport(suiteReport);
 		setIsLocalTest(isLocalTest);
 		setAppiumUrl(appiumUrl);
 		setApiUrl(apiUrl);
-	}
-
-	public void setSuiteId(long suiteId) {
-		reporter.setSuiteId(suiteId);
 	}
 
 	public void setAppiumUrl(URL appiumUrl) {
@@ -90,10 +84,6 @@ public class RdcAppiumSuiteWatcher extends TestWatcher {
 	public void setIsLocalTest(boolean isLocalTest) {
 		this.isLocalTest = isLocalTest;
 		provider.setLocalTest(isLocalTest);
-	}
-
-	public void setSuiteReport(SuiteReport suiteReport) {
-		reporter.setSuiteReport(suiteReport);
 	}
 
 	public String getTestReportId() {
