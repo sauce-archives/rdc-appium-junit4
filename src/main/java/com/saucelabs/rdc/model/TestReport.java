@@ -7,27 +7,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TestReport {
 
-	private final Id id;
+	private final int id;
 	private final RdcTest test;
 
 	@JsonCreator
-	public TestReport(@JsonProperty("id") Id id, @JsonProperty("test") RdcTest test) {
+	public TestReport(@JsonProperty("id") int id, @JsonProperty("test") RdcTest test) {
 		this.id = id;
 		this.test = test;
 	}
 
-	public Id getId() {
+	public int getId() {
 		return id;
 	}
 
 	public RdcTest getTest() {
 		return test;
 	}
-
-	public static class Id extends com.saucelabs.rdc.model.Id<Integer> {
-		public Id(Integer value) {
-			super(value);
-		}
-	}
-
 }

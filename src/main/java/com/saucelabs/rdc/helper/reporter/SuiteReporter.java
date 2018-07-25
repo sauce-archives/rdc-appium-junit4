@@ -3,9 +3,10 @@ package com.saucelabs.rdc.helper.reporter;
 import com.saucelabs.rdc.helper.RdcListenerProvider;
 import com.saucelabs.rdc.model.RdcTest;
 import com.saucelabs.rdc.model.SuiteReport;
-import com.saucelabs.rdc.model.TestReport;
 import com.saucelabs.rdc.model.TestResult;
 import com.saucelabs.rdc.resource.AppiumReportResource;
+
+import java.util.OptionalInt;
 
 public class SuiteReporter extends ResultReporter {
 
@@ -38,10 +39,13 @@ public class SuiteReporter extends ResultReporter {
 	}
 
 	private void updateSuiteReport(SuiteReport suiteReport, RdcTest test, boolean passed) {
-		TestReport.Id testReportId = suiteReport.getTestReportId(test)
-				.orElseThrow(() -> new IllegalArgumentException("unknown test " + test));
-
-		new AppiumReportResource(client).finishAppiumTestReport(suiteId, suiteReport.getId(), testReportId, new TestResult(passed));
+		OptionalInt testReportId = suiteReport.getTestReportId(test);
+		if (testReportId.isPresent()) {
+			new AppiumReportResource(client)
+				.finishAppiumTestReport(suiteId, suiteReport.getId(), testReportId.getAsInt(), new TestResult(passed));
+		} else {
+			throw new IllegalArgumentException("unknown test " + test);
+		}
 	}
 
 	public SuiteReport suiteReport() {

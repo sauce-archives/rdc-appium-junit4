@@ -10,7 +10,7 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Suite {
 
-	private final Id id;
+	private final long id;
 	private final String title;
 	private final long appVersionId;
 	private final String frameworkVersion;
@@ -18,7 +18,7 @@ public class Suite {
 
 	@JsonCreator
 	public Suite(
-			@JsonProperty("id") Id id,
+			@JsonProperty("id") long id,
 			@JsonProperty("title") String title,
 			@JsonProperty("appVersionId") long appVersionId,
 			@JsonProperty("frameworkVersion") String frameworkVersion,
@@ -31,7 +31,7 @@ public class Suite {
 		this.deviceIds = deviceIds;
 	}
 
-	public Id getId() {
+	public long getId() {
 		return id;
 	}
 
@@ -50,11 +50,4 @@ public class Suite {
 	public Map<String, Set<String>> getDeviceIds() {
 		return deviceIds;
 	}
-
-	public static class Id extends com.saucelabs.rdc.model.Id<Integer> {
-		public Id(Integer value) {
-			super(value);
-		}
-	}
-
 }

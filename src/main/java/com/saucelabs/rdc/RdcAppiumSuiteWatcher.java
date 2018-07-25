@@ -12,6 +12,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.OptionalInt;
 
 public class RdcAppiumSuiteWatcher extends TestWatcher {
 
@@ -96,8 +97,12 @@ public class RdcAppiumSuiteWatcher extends TestWatcher {
 	}
 
 	public String getTestReportId() {
-		return reporter.suiteReport().getTestReportId(test)
-				.orElseThrow(() -> new IllegalStateException("test report not present")).toString();
+		OptionalInt id = reporter.suiteReport().getTestReportId(test);
+		if (id.isPresent()) {
+			return Integer.toString(id.getAsInt());
+		} else {
+			throw new IllegalStateException("test report not present");
+		}
 	}
 
 	public String getTestDeviceId() {
