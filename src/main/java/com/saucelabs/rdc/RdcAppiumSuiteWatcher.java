@@ -5,16 +5,16 @@ import com.saucelabs.rdc.helper.RdcTestParser;
 import com.saucelabs.rdc.helper.reporter.SuiteReporter;
 import com.saucelabs.rdc.model.RdcTest;
 import com.saucelabs.rdc.model.SuiteReport;
-import org.junit.AssumptionViolatedException;
-import org.junit.rules.TestWatcher;
+import org.junit.rules.TestRule;
 import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.OptionalInt;
 
-public class RdcAppiumSuiteWatcher extends TestWatcher {
+public class RdcAppiumSuiteWatcher implements TestRule {
 
 	private String apiKey;
 	private RdcTest test;
@@ -29,40 +29,46 @@ public class RdcAppiumSuiteWatcher extends TestWatcher {
 		provider = RdcListenerProvider.newInstance();
 	}
 
-	@Override
-	protected void starting(Description description) {
-		test = RdcTestParser.from(description);
-	}
-
-	@Override
-	protected void succeeded(Description description) {
-		reporter.processAndReportResult(true, RdcTestParser.from(description));
-	}
-
-	@Override
-	protected void failed(Throwable e, Description description) {
-		reporter.processAndReportResult(false, RdcTestParser.from(description));
-	}
-
-	@Override
-	protected void skipped(AssumptionViolatedException e, Description description) {
-		reporter.processAndReportResult(false, RdcTestParser.from(description));
-	}
-
-	@Override
-	protected void skipped(org.junit.internal.AssumptionViolatedException e, Description description) {
-		reporter.processAndReportResult(false, RdcTestParser.from(description));
-	}
-
-	@Override
-	protected void finished(Description description) {
-		reporter.close();
-	}
-
-	public void setRemoteWebDriver(RemoteWebDriver driver) {
+	public void setRemoteWebDriver(RemoteWebDriver webDriver) {
 		provider.setApiUrl(apiUrl);
-		provider.setDriver(driver);
+		provider.setDriver(webDriver);
 		reporter.setProvider(provider);
+	}
+
+	@Override
+	public Statement apply(Statement base, Description description) {
+		return new Statement() {
+			@Override
+			public void evaluate() throws Throwable {
+				try {
+					test = RdcTestParser.from(description);
+					base.evaluate();
+					safeReportStatus(true, description);
+				} catch (Throwable e) {
+					safeReportStatus(false, description);
+					throw e;
+				} finally {
+					reporter.close();
+				}
+			}
+		};
+	}
+
+	private void safeReportStatus(boolean status, Description description) {
+		if (provider.getRemoteWebDriver() != null) {
+			try {
+				reportStatus(status, description);
+			} catch (Exception e) {
+				System.err.println(
+					"Failed to update test report. Caused by "
+						+ e.getLocalizedMessage());
+			}
+		}
+	}
+
+	private void reportStatus(boolean status, Description description) {
+		RdcTest test = RdcTestParser.from(description);
+		reporter.processAndReportResult(status, test);
 	}
 
 	public void configure(String apiKey, long suiteId, SuiteReport suiteReport, boolean isLocalTest, URL appiumUrl, URL apiUrl) {
