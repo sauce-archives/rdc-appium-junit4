@@ -15,36 +15,35 @@ import static java.util.Objects.requireNonNull;
 
 public class ResultReporter {
 
-	protected RestClient client;
-
 	private RemoteWebDriver webDriver;
 
 	public void setRemoteWebDriver(RemoteWebDriver webDriver) {
 		this.webDriver = webDriver;
 	}
 
-	public void initClient(URL apiUrl) {
-		this.client = RestClient.Builder.createClient()
-				.withEndpoint(apiUrl.toString())
-				.withToken((String) webDriver.getCapabilities().getCapability(API_KEY))
-				.path(APPIUM_REST_PATH)
-				.build();
-	}
-
 	public void close() {
 		if (webDriver != null) {
 			webDriver.quit();
-			client.close();
 		}
 	}
 
-	public void createSuiteReportAndTestReport(boolean passed) {
-		AppiumSessionResource appiumSessionResource = new AppiumSessionResource(client);
+	public void createSuiteReportAndTestReport(boolean passed, URL apiUrl) {
 		requireNonNull(webDriver, "The WebDriver instance is not set.");
-		Response response = appiumSessionResource.updateTestReportStatus(webDriver.getSessionId().toString(), passed);
-		if (response.getStatus() != 204) {
-			System.err.println("Test report status might not be updated on Sauce Labs RDC (TestObject). Status: " + response.getStatus());
+		try (RestClient client = createClient(apiUrl)) {
+			AppiumSessionResource appiumSessionResource = new AppiumSessionResource(client);
+			Response response = appiumSessionResource.updateTestReportStatus(webDriver.getSessionId().toString(), passed);
+			if (response.getStatus() != 204) {
+				System.err.println("Test report status might not be updated on Sauce Labs RDC (TestObject). Status: " + response.getStatus());
+			}
 		}
+	}
+
+	RestClient createClient(URL apiUrl) {
+		return RestClient.Builder.createClient()
+			.withEndpoint(apiUrl.toString())
+			.withToken((String) webDriver.getCapabilities().getCapability(API_KEY))
+			.path(APPIUM_REST_PATH)
+			.build();
 	}
 
 	public void processResult(boolean passed) {

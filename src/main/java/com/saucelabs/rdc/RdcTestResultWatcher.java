@@ -51,8 +51,7 @@ public class RdcTestResultWatcher implements TestRule {
 	private void reportStatus(boolean status) throws MalformedURLException {
 		ResultReporter reporter = new ResultReporter();
 		reporter.setRemoteWebDriver(webDriver);
-		reporter.initClient(apiUrl());
-		reporter.createSuiteReportAndTestReport(status);
+		reporter.createSuiteReportAndTestReport(status, apiUrl());
 		reporter.close();
 	}
 

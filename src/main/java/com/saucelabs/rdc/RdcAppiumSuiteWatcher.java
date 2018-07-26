@@ -27,7 +27,6 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 	public void setRemoteWebDriver(RemoteWebDriver webDriver) {
 		this.webDriver = webDriver;
 		reporter.setRemoteWebDriver(webDriver);
-		reporter.initClient(apiUrl);
 	}
 
 	@Override
@@ -63,7 +62,7 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 
 	private void reportStatus(boolean status, Description description) {
 		RdcTest test = RdcTestParser.from(description);
-		reporter.processAndReportResult(status, test);
+		reporter.processAndReportResult(status, test, apiUrl);
 	}
 
 	public void configure(String apiKey, long suiteId, SuiteReport suiteReport, boolean isLocalTest, URL appiumUrl, URL apiUrl) {
