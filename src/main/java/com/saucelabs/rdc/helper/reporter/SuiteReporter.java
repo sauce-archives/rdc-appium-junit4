@@ -1,6 +1,5 @@
 package com.saucelabs.rdc.helper.reporter;
 
-import com.saucelabs.rdc.helper.RdcListenerProvider;
 import com.saucelabs.rdc.model.RdcTest;
 import com.saucelabs.rdc.model.SuiteReport;
 import com.saucelabs.rdc.model.TestResult;
@@ -43,10 +42,5 @@ public class SuiteReporter extends ResultReporter {
 
 	public SuiteReport suiteReport() {
 		return suiteReport;
-	}
-
-	public void setProvider(RdcListenerProvider provider) {
-		super.provider = provider;
-		super.initClient();
 	}
 }

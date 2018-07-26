@@ -1,6 +1,5 @@
 package com.saucelabs.rdc;
 
-import com.saucelabs.rdc.helper.RdcListenerProvider;
 import com.saucelabs.rdc.helper.RdcTestParser;
 import com.saucelabs.rdc.helper.reporter.SuiteReporter;
 import com.saucelabs.rdc.model.RdcTest;
@@ -23,16 +22,12 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 	private URL apiUrl;
 
 	private SuiteReporter reporter;
-	private RdcListenerProvider provider;
-
-	public RdcAppiumSuiteWatcher() {
-		provider = RdcListenerProvider.newInstance();
-	}
+	private RemoteWebDriver webDriver;
 
 	public void setRemoteWebDriver(RemoteWebDriver webDriver) {
-		provider.setApiUrl(apiUrl);
-		provider.setDriver(webDriver);
-		reporter.setProvider(provider);
+		this.webDriver = webDriver;
+		reporter.setRemoteWebDriver(webDriver);
+		reporter.initClient(apiUrl);
 	}
 
 	@Override
@@ -55,7 +50,7 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 	}
 
 	private void safeReportStatus(boolean status, Description description) {
-		if (provider.getRemoteWebDriver() != null) {
+		if (webDriver != null) {
 			try {
 				reportStatus(status, description);
 			} catch (Exception e) {
@@ -89,7 +84,6 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 
 	public void setIsLocalTest(boolean isLocalTest) {
 		this.isLocalTest = isLocalTest;
-		provider.setLocalTest(isLocalTest);
 	}
 
 	public String getTestReportId() {

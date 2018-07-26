@@ -1,6 +1,5 @@
 package com.saucelabs.rdc;
 
-import com.saucelabs.rdc.helper.RdcListenerProvider;
 import com.saucelabs.rdc.helper.reporter.ResultReporter;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -50,11 +49,9 @@ public class RdcTestResultWatcher implements TestRule {
 	}
 
 	private void reportStatus(boolean status) throws MalformedURLException {
-		RdcListenerProvider provider = RdcListenerProvider.newInstance();
-		provider.setApiUrl(apiUrl());
-		provider.setDriver(webDriver);
-
-		ResultReporter reporter = new ResultReporter(provider);
+		ResultReporter reporter = new ResultReporter();
+		reporter.setRemoteWebDriver(webDriver);
+		reporter.initClient(apiUrl());
 		reporter.createSuiteReportAndTestReport(status);
 		reporter.close();
 	}
