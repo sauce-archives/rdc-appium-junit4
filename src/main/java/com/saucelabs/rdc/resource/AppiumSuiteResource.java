@@ -3,9 +3,7 @@ package com.saucelabs.rdc.resource;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.saucelabs.rdc.helper.RestClient;
 import com.saucelabs.rdc.model.DataCenterSuite;
-import com.saucelabs.rdc.model.Suite;
 
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericType;
 import java.util.Set;
 
@@ -30,15 +28,4 @@ public class AppiumSuiteResource {
 				.get(new GenericType<>(new TypeReference<Set<DataCenterSuite>>() {
 				}.getType()));
 	}
-
-	/**
-	 * Updates the properties of a suite
-	 */
-	public Suite updateSuite(long suiteId, Suite suite) {
-		return client
-				.path("suites").path(Long.toString(suiteId))
-				.request(APPLICATION_JSON_TYPE)
-				.put(Entity.json(suite), Suite.class);
-	}
-
 }
