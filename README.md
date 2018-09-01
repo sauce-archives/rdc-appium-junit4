@@ -23,7 +23,7 @@ RDC Appium Support for Junit 4 is available on
 <dependency>
   <groupId>com.saucelabs</groupId>
   <artifactId>rdc-appium-junit4</artifactId>
-  <version>not released yet</version>
+  <version>1.0.0</version>
   <scope>test</scope>
 </dependency>
 ```
