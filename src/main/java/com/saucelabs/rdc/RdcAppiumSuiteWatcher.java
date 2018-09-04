@@ -13,6 +13,51 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.OptionalInt;
 
+/**
+ * {@code RdcAppiumSuiteWatcher} updates the result of a test at Sauce Labs and
+ * closes the {@code WebDriver} at the end of the test. It is designed for
+ * tests that are executed by the {@link RdcAppiumSuite} runner.
+ * <p>Sauce Labs stores data about each test that you are executing on its Real
+ * Device Cloud, e.g. request logs and screenshots. By default Sauce Labs does
+ * not store the result of an Appium test. This is because the test result is
+ * determined by the client that executes the test and therefore Sauce Labs
+ * does not know about it.
+ * <p>When your test is run by {@link RdcAppiumSuite} runner then you can
+ * automatically update the test result by adding an
+ * {@code RdcAppiumSuiteWatcher} rule to your test. Apart from adding the rule
+ * you also have to call
+ * {@link #setRemoteWebDriver(RemoteWebDriver) setRemoteWebDriver} because the
+ * watcher needs to read the session from the {@code AppiumDriver} so that it
+ * updates the right test. See the following example.
+ * <pre>  {@literal @}RunWith(RdcAppiumSuite.class)
+ * {@link Rdc @Rdc}(suiteId = 42)
+ * public class YourTest {
+ *    {@literal @Rule}
+ *     public final RdcAppiumSuiteWatcher watcher = new RdcAppiumSuiteWatcher();
+ *
+ *     private AppiumDriver driver;
+ *
+ *    {@literal @Before}
+ *     public void setup() {
+ *         DesiredCapabilities capabilities = new DesiredCapabilities();
+ *         capabilities.setCapability({@link RdcCapabilities#API_KEY}, watcher.getApiKey());
+ *         capabilities.setCapability({@link RdcCapabilities#TEST_REPORT_ID}, watcher.getTestReportId());
+ *
+ *         driver = new AndroidDriver(watcher.getAppiumEndpointUrl(), capabilities);
+ *         watcher.setRemoteWebDriver(driver);
+ *     }
+ *
+ *    {@literal @Test}
+ *     public void yourTest() {
+ *         ... //your test code
+ *     }
+ * }
+ * </pre>
+ * <p>{@code RdcTestResultWatcher} quits the WebDriver at the end of the test. You
+ * don't have to do it in an {@literal @After} method anymore.
+ *
+ * @since 1.0.0
+ */
 public class RdcAppiumSuiteWatcher implements TestRule {
 
 	private static final boolean PASSED = true;
@@ -26,6 +71,12 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 	private SuiteReporter reporter;
 	private RemoteWebDriver webDriver;
 
+	/**
+	 * Set the WebDriver. {@code RdcAppiumSuiteWatcher} needs to read the API key
+	 * and the session from the {@code AppiumDriver}.
+	 * @param webDriver the WebDriver that is used for the test.
+	 * @since 1.0.0
+	 */
 	public void setRemoteWebDriver(RemoteWebDriver webDriver) {
 		this.webDriver = webDriver;
 		reporter.setRemoteWebDriver(webDriver);
@@ -99,6 +150,12 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 		this.isLocalTest = isLocalTest;
 	}
 
+	/**
+	 * Returns the ID of the Sauce Labs' test report of this test. This ID has
+	 * to be sent as part of {@code DesiredCapabilities}.
+	 * <pre>capabilities.setCapability({@link RdcCapabilities#TEST_REPORT_ID}, watcher.getTestReportId());</pre>
+	 * @return the ID of the Sauce Labs' test report of this test
+	 */
 	public String getTestReportId() {
 		OptionalInt id = reporter.suiteReport().getTestReportId(test);
 		if (id.isPresent()) {
@@ -113,6 +170,13 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 				.orElseThrow(() -> new IllegalStateException("test device not present"));
 	}
 
+	/**
+	 * Returns the API key that was configured for the {@link RdcAppiumSuite}
+	 * runner that executes the tests. The API key has to be sent as part of
+	 * {@code DesiredCapabilities}.
+	 * <pre>capabilities.setCapability({@link RdcCapabilities#API_KEY}, watcher.getApiKey());</pre>
+	 * @return the API key that was configured for the {@link RdcAppiumSuite}
+	 */
 	public String getApiKey() {
 		return apiKey;
 	}
@@ -121,6 +185,10 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 		this.apiKey = apiKey;
 	}
 
+	/**
+	 * Returns the remote address for the {@code AppiumDriver}.
+	 * @return the remote address for the {@code AppiumDriver}.
+	 */
 	public URL getAppiumEndpointUrl() {
 		if (isLocalTest) {
 			try {

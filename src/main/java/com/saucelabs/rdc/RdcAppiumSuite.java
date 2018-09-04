@@ -50,9 +50,10 @@ import static java.util.Objects.requireNonNull;
  *    {@literal @Before}
  *     public void setup() {
  *         DesiredCapabilities capabilities = new DesiredCapabilities();
- *         capabilities.setCapability({@link RdcCapabilities#API_KEY}, "Your project API key");
+ *         capabilities.setCapability({@link RdcCapabilities#API_KEY}, {@link RdcAppiumSuiteWatcher#getApiKey() watcher.getApiKey()});
+ *         capabilities.setCapability({@link RdcCapabilities#TEST_REPORT_ID}, {@link RdcAppiumSuiteWatcher#getTestReportId() watcher.getTestReportId()});
  *
- *         driver = new AndroidDriver({@link RdcEndpoints#EU_ENDPOINT}, capabilities);
+ *         driver = new AndroidDriver({@link RdcAppiumSuiteWatcher#getAppiumEndpointUrl() watcher.getAppiumEndpointUrl()}, capabilities);
  *         watcher.setRemoteWebDriver(driver);
  *     }
  *
@@ -70,12 +71,12 @@ import static java.util.Objects.requireNonNull;
  *
  * <h2>Additional Settings</h2>
  *
- * The two setting {@code suiteId} and {@code apiKey} are mandatory but there
+ * The two settings {@code suiteId} and {@code apiKey} are mandatory but there
  * are also some optional settings that you can use.
  *
  * <h3>App ID</h3>
- * <p>The id of your app changes every time you upload a new release. Either
- * you update the id of the app that is used by the suite manually at the Sauce
+ * <p>The ID of your app changes every time you upload a new release. Either
+ * you update the ID of the app that is used by the suite manually at the Sauce
  * Labs website or you can use the {@code RdcAppiumSuite} runner. It updates
  * the app ID when you set the element {@link Rdc#appId() appId} of the
  * {@code @Rdc} annotation or if you set an environment variable
