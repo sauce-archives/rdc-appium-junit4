@@ -6,7 +6,6 @@ import com.saucelabs.rdc.model.SuiteReport;
 import com.saucelabs.rdc.resource.AppiumReportResource;
 
 import java.net.URL;
-import java.util.OptionalInt;
 
 public class SuiteReporter extends ResultReporter {
 
@@ -32,14 +31,10 @@ public class SuiteReporter extends ResultReporter {
 	}
 
 	private void updateSuiteReport(SuiteReport suiteReport, RdcTest test, boolean passed, URL apiUrl) {
-		OptionalInt testReportId = suiteReport.getTestReportId(test);
-		if (testReportId.isPresent()) {
-			try (RestClient client = createClient(apiUrl)) {
-				new AppiumReportResource(client)
-					.finishAppiumTestReport(suiteId, suiteReport.getId(), testReportId.getAsInt(), passed);
-			}
-		} else {
-			throw new IllegalArgumentException("unknown test " + test);
+		int testReportId = suiteReport.getTestReportId(test);
+		try (RestClient client = createClient(apiUrl)) {
+			new AppiumReportResource(client)
+				.finishAppiumTestReport(suiteId, suiteReport.getId(), testReportId, passed);
 		}
 	}
 }

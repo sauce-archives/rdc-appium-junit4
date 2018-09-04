@@ -11,7 +11,6 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.OptionalInt;
 
 /**
  * {@code RdcAppiumSuiteWatcher} updates the result of a test at Sauce Labs and
@@ -152,12 +151,8 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 		if (suiteReport == null) {
 			return null;
 		} else {
-			OptionalInt id = suiteReport.getTestReportId(test);
-			if (id.isPresent()) {
-				return Integer.toString(id.getAsInt());
-			} else {
-				throw new IllegalStateException("test report not present");
-			}
+			int id = suiteReport.getTestReportId(test);
+			return Integer.toString(id);
 		}
 	}
 
