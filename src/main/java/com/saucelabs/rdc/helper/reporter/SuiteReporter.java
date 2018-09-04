@@ -3,7 +3,6 @@ package com.saucelabs.rdc.helper.reporter;
 import com.saucelabs.rdc.helper.RestClient;
 import com.saucelabs.rdc.model.RdcTest;
 import com.saucelabs.rdc.model.SuiteReport;
-import com.saucelabs.rdc.model.TestResult;
 import com.saucelabs.rdc.resource.AppiumReportResource;
 
 import java.net.URL;
@@ -37,7 +36,7 @@ public class SuiteReporter extends ResultReporter {
 		if (testReportId.isPresent()) {
 			try (RestClient client = createClient(apiUrl)) {
 				new AppiumReportResource(client)
-					.finishAppiumTestReport(suiteId, suiteReport.getId(), testReportId.getAsInt(), new TestResult(passed));
+					.finishAppiumTestReport(suiteId, suiteReport.getId(), testReportId.getAsInt(), passed);
 			}
 		} else {
 			throw new IllegalArgumentException("unknown test " + test);

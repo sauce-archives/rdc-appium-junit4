@@ -4,14 +4,13 @@ import com.saucelabs.rdc.helper.RestClient;
 import com.saucelabs.rdc.model.RdcTest;
 import com.saucelabs.rdc.model.SuiteReport;
 import com.saucelabs.rdc.model.TestReport;
-import com.saucelabs.rdc.model.TestResult;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
-import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Set;
 
+import static java.util.Collections.singletonMap;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 
 public class AppiumReportResource {
@@ -54,14 +53,14 @@ public class AppiumReportResource {
 	 * Sets the status of the specific test execution and marks it as finished
 	 */
 	public TestReport finishAppiumTestReport(long suiteId, long batchReportId, int testReportId,
-			TestResult testResult) {
+			boolean passed) {
 		return client
 				.path("suites").path(Long.toString(suiteId))
 				.path("reports").path(Long.toString(batchReportId))
 				.path("results").path(Integer.toString(testReportId))
 				.path("finish")
 				.request(APPLICATION_JSON_TYPE)
-				.put(Entity.json(testResult), TestReport.class);
+				.put(Entity.json(singletonMap("passed", passed)), TestReport.class);
 	}
 
 }
