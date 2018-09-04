@@ -131,23 +131,11 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 	}
 
 	public void configure(String apiKey, long suiteId, SuiteReport suiteReport, boolean isLocalTest, URL appiumUrl, URL apiUrl) {
-		reporter = new SuiteReporter(suiteId, suiteReport);
-		setApiKey(apiKey);
-		setIsLocalTest(isLocalTest);
-		setAppiumUrl(appiumUrl);
-		setApiUrl(apiUrl);
-	}
-
-	public void setAppiumUrl(URL appiumUrl) {
-		this.appiumUrl = appiumUrl;
-	}
-
-	public void setApiUrl(URL apiUrl) {
+		this.apiKey = apiKey;
 		this.apiUrl = apiUrl;
-	}
-
-	public void setIsLocalTest(boolean isLocalTest) {
+		this.appiumUrl = appiumUrl;
 		this.isLocalTest = isLocalTest;
+		this.reporter = new SuiteReporter(suiteId, suiteReport);
 	}
 
 	/**
@@ -179,10 +167,6 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 	 */
 	public String getApiKey() {
 		return apiKey;
-	}
-
-	public void setApiKey(String apiKey) {
-		this.apiKey = apiKey;
 	}
 
 	/**
