@@ -1,5 +1,11 @@
 package com.saucelabs.rdc;
 
+/**
+ * A collection of capabilities that are supported by Sauce Labs. More
+ * information is available at
+ * <a href="https://wiki.saucelabs.com/display/DOCS/Appium+Capabilities+for+Real+Device+Testing#AppiumCapabilitiesforRealDeviceTesting-WebDriverAgentTimeoutforiOSDevices">Appium
+ * Capabilities for Real Device Testing.</a>
+ */
 public class RdcCapabilities {
 	public static final String API_KEY = "testobject_api_key";
 	public static final String DEVICE = "testobject_device";

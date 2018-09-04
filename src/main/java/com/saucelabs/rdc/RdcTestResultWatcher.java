@@ -14,7 +14,7 @@ import static com.saucelabs.rdc.helper.RdcEnvironmentVariables.getApiEndpoint;
 /**
  * An {@code RdcTestResultWatcher} updates the result of a test at Sauce Labs.
  * <p>Sauce Labs stores data about each test that you are executing on its Real
- * Device Cloud, e.g. request logs and screen shots. By default Sauce Labs does
+ * Device Cloud, e.g. request logs and screenshots. By default Sauce Labs does
  * not store the result of an Appium test. This is because the test result is
  * determined by the client that executes the test and therefore Sauce Labs
  * does not know about it.
