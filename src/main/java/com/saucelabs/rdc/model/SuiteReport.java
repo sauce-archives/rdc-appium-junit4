@@ -33,14 +33,4 @@ public class SuiteReport {
 
 		return OptionalInt.empty();
 	}
-
-	public Optional<String> getTestDeviceId(RdcTest test) {
-		for (TestReport testReport : testReports) {
-			if (testReport.getTest().equals(test)) {
-				return Optional.of(testReport.getTest().getDeviceId());
-			}
-		}
-
-		return Optional.empty();
-	}
 }

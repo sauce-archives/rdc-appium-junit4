@@ -161,11 +161,6 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 		}
 	}
 
-	public String getTestDeviceId() {
-		return suiteReport.getTestDeviceId(test)
-				.orElseThrow(() -> new IllegalStateException("test device not present"));
-	}
-
 	/**
 	 * Returns the API key that was configured for the {@link RdcAppiumSuite}
 	 * runner that executes the tests. The API key has to be sent as part of
