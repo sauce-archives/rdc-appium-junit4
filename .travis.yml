@@ -5,11 +5,13 @@ after_success:
 - gpg2 --allow-secret-key-import --keyring=$TRAVIS_BUILD_DIR/secring.gpg --no-default-keyring
   --import deployment/signingkey.asc
 - |
-  mvn \
-    --settings deployment/settings.xml \
-    -Dgpg.publicKeyring=$TRAVIS_BUILD_DIR/pubring.gpg \
-    -Dgpg.secretKeyring=$TRAVIS_BUILD_DIR/secring.gpg \
-    clean deploy
+  test "${TRAVIS_BRANCH}" == "master" \
+    && test "${TRAVIS_PULL_REQUEST}" == "false" \
+    && mvn \
+         --settings deployment/settings.xml \
+         -Dgpg.publicKeyring=$TRAVIS_BUILD_DIR/pubring.gpg \
+         -Dgpg.secretKeyring=$TRAVIS_BUILD_DIR/secring.gpg \
+         clean deploy
 env:
   global:
   - secure: UVyWhJlmVi9Mi6qT2wNXx+6nu3KAoYx2E5Cf2SdZm2NOjXp3xpTsO56M4uRgd8UO0Q00bUPs86Cvv1wkljbYCynqEYqdnd2EL7qkNPrCCDbz+QWQHQy3wQGb6ta9G5akKZbpv5wF3R9p2gKz7Lsuar7cE32RrQyhTT/DIO6dbwYegzS6IaQdflhLDUJ2EjRRQVNsB+hlJwuzCkL6EYcwdsK0My1epaOi6usgdltAha7bdRrZqEu+2MdZcTbyi+uylEWrGaY2ALiTXMP37Jt5+GIe98useJxcHhMQIm62r/wWgX3UVL5YQdRTx820jtgMtj3aC2p/Q006frv47XmhvxedWfwAU95tZZyVpHw1nJ+BSn0W7oFwA0gz66XeMObRj8CdXbTo0QgHxjF+Gr9ZgNL7BGt8wldK8l1v8flLJIiEoQ3iCSDIYU2BjD8Mr/Mw+Ya8p73EMGef0gJ6Sks8amOGtjQ26ANr0Qc3SsShT+o0HA2FKmZFDXln4QTx1wtZRguJ0CSfyQgQ9zrcILlc2wGHQKR96SQ6wxEKQA6gvj9r75Hj6wXazyuQdAPeRlnczOOyAx0eUi6t9C7PAHKuS/jZGZr4HQQrU6AQnmHGhJn+XIQeafOpWw5BASI0o30B3EzEbgvI2J4HEPPdg4iB9npqGhF2rnkjzdqxoBkenNc=
