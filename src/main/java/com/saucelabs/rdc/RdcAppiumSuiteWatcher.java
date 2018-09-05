@@ -7,6 +7,7 @@ import com.saucelabs.rdc.model.SuiteReport;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
+import org.openqa.selenium.OutputType;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.net.MalformedURLException;
@@ -91,6 +92,7 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 					safeUpdateTestReport(PASSED, description);
 				} catch (Throwable e) {
 					safeUpdateTestReport(!PASSED, description);
+					retrievePageSourceAndScreenshot();
 					throw e;
 				} finally {
 					safeQuitWebDriver();
@@ -115,7 +117,7 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 		RdcTest test = RdcTestParser.from(description);
 		SuiteReporter reporter = new SuiteReporter(suiteId, suiteReport);
 		reporter.setRemoteWebDriver(webDriver);
-		reporter.processAndReportResult(passed, test, apiUrl);
+		reporter.reportResult(passed, test, apiUrl);
 	}
 
 	private void safeQuitWebDriver() {
@@ -180,6 +182,13 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 			}
 		} else {
 			return appiumUrl;
+		}
+	}
+
+	private void retrievePageSourceAndScreenshot() {
+		if (webDriver != null) {
+			webDriver.getPageSource();
+			webDriver.getScreenshotAs(OutputType.FILE);
 		}
 	}
 }

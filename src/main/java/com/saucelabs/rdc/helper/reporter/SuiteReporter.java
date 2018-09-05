@@ -17,12 +17,7 @@ public class SuiteReporter extends ResultReporter {
 		this.suiteReport = suiteReport;
 	}
 
-	public void processAndReportResult(boolean passed, RdcTest test, URL apiUrl) {
-		processResult(passed);
-		reportResult(passed, test, apiUrl);
-	}
-
-	private void reportResult(boolean passed, RdcTest test, URL apiUrl) {
+	public void reportResult(boolean passed, RdcTest test, URL apiUrl) {
 		if (suiteReport == null) {
 			createSuiteReportAndTestReport(passed, apiUrl);
 		} else {

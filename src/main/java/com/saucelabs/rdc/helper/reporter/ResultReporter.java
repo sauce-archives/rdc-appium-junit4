@@ -37,15 +37,4 @@ public class ResultReporter {
 			.path("/rest/v2/appium")
 			.build();
 	}
-
-	void processResult(boolean passed) {
-		if (webDriver == null) {
-			throw new IllegalStateException("appium driver must be set using setDriver method");
-		}
-
-		if (!passed) {
-			webDriver.getPageSource();
-			webDriver.getScreenshotAs(OutputType.FILE);
-		}
-	}
 }
