@@ -25,8 +25,6 @@ public @interface Rdc {
 	 */
 	long suiteId();
 
-	String apiUrl() default "https://app.testobject.com/api";
-
 	/**
 	 * The version of the application that is used for testing.
 	 */

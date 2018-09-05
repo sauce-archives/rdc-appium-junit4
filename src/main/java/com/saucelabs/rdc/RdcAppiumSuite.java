@@ -122,7 +122,7 @@ public class RdcAppiumSuite extends Suite {
 			apiKey = getApiKey(rdcAnnotation);
 			suiteId = getSuiteId(rdcAnnotation);
 			appId = getAppId(rdcAnnotation);
-			String apiEndpoint = getApiEndpoint(rdcAnnotation);
+			String apiEndpoint = getApiEndpoint();
 
 			client = RestClient.Builder.createClient()
 					.withEndpoint(apiEndpoint)
@@ -195,9 +195,9 @@ public class RdcAppiumSuite extends Suite {
 				.orElse(rdcAnnotation.timeoutUnit());
 	}
 
-	private String getApiEndpoint(Rdc rdcAnnotation) {
+	private String getApiEndpoint() {
 		return RdcEnvironmentVariables.getApiEndpoint()
-				.orElse(rdcAnnotation.apiUrl());
+				.orElse("https://app.testobject.com/api");
 	}
 
 	@Override
