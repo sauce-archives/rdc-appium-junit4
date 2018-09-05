@@ -62,13 +62,13 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 
 	private static final boolean PASSED = true;
 
-	private String apiKey;
+	String apiKey;
 	private RdcTest test;
-	private boolean isLocalTest;
-	private URL appiumUrl;
-	private URL apiUrl;
-	private long suiteId;
-	private SuiteReport suiteReport;
+	boolean isLocalTest;
+	URL appiumUrl;
+	URL apiUrl;
+	long suiteId;
+	SuiteReport suiteReport;
 	private RemoteWebDriver webDriver;
 
 	/**
@@ -130,15 +130,6 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 						+ e.getLocalizedMessage());
 			}
 		}
-	}
-
-	public void configure(String apiKey, long suiteId, SuiteReport suiteReport, boolean isLocalTest, URL appiumUrl, URL apiUrl) {
-		this.apiKey = apiKey;
-		this.apiUrl = apiUrl;
-		this.appiumUrl = appiumUrl;
-		this.isLocalTest = isLocalTest;
-		this.suiteId = suiteId;
-		this.suiteReport = suiteReport;
 	}
 
 	/**

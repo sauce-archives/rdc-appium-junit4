@@ -320,7 +320,12 @@ public class RdcAppiumSuite extends Suite {
 			for (TestRule rule : rules) {
 				if (rule instanceof RdcAppiumSuiteWatcher) {
 					RdcAppiumSuiteWatcher watcher = (RdcAppiumSuiteWatcher) rule;
-					watcher.configure(apiKey, suiteId, suiteReport, isTestingLocally, appiumUrl, apiUrl);
+					watcher.apiKey = apiKey;
+					watcher.apiUrl = apiUrl;
+					watcher.appiumUrl = appiumUrl;
+					watcher.isLocalTest = isTestingLocally;
+					watcher.suiteId = suiteId;
+					watcher.suiteReport = suiteReport;
 				}
 			}
 		}
