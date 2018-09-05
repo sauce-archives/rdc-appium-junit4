@@ -42,8 +42,4 @@ public class SuiteReporter extends ResultReporter {
 			throw new IllegalArgumentException("unknown test " + test);
 		}
 	}
-
-	public SuiteReport suiteReport() {
-		return suiteReport;
-	}
 }

@@ -69,6 +69,7 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 	private URL apiUrl;
 
 	private SuiteReporter reporter;
+	private SuiteReport suiteReport;
 	private RemoteWebDriver webDriver;
 
 	/**
@@ -136,6 +137,7 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 		this.appiumUrl = appiumUrl;
 		this.isLocalTest = isLocalTest;
 		this.reporter = new SuiteReporter(suiteId, suiteReport);
+		this.suiteReport = suiteReport;
 	}
 
 	/**
@@ -147,10 +149,10 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 	 * {@code null} when the test runs locally.
 	 */
 	public String getTestReportId() {
-		if (isLocalTest) {
+		if (suiteReport == null) {
 			return null;
 		} else {
-			OptionalInt id = reporter.suiteReport().getTestReportId(test);
+			OptionalInt id = suiteReport.getTestReportId(test);
 			if (id.isPresent()) {
 				return Integer.toString(id.getAsInt());
 			} else {
@@ -160,7 +162,7 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 	}
 
 	public String getTestDeviceId() {
-		return reporter.suiteReport().getTestDeviceId(test)
+		return suiteReport.getTestDeviceId(test)
 				.orElseThrow(() -> new IllegalStateException("test device not present"));
 	}
 
