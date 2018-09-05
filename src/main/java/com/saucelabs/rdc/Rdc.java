@@ -26,7 +26,10 @@ public @interface Rdc {
 	long suiteId();
 
 	/**
-	 * The version of the application that is used for testing.
+	 * The version of the application that is used for testing. Normally you
+	 * don't have to set the app version. By default your tests are executed
+	 * with the active version of the app (it is usually the last uploaded
+	 * version).
 	 */
 	long appId() default -1;
 
