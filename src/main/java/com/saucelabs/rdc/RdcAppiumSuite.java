@@ -74,14 +74,16 @@ import static java.util.Objects.requireNonNull;
  * The two settings {@code suiteId} and {@code apiKey} are mandatory but there
  * are also some optional settings that you can use.
  *
- * <h3>App ID</h3>
- * <p>The ID of your app changes every time you upload a new release. Either
- * you update the ID of the app that is used by the suite manually at the Sauce
- * Labs website or you can use the {@code RdcAppiumSuite} runner. It updates
- * the app ID when you set the element {@link Rdc#appId() appId} of the
- * {@code @Rdc} annotation or if you set an environment variable
- * {@code "APP_ID"}. The environment variable takes precedence over the
- * annotation.
+ * <h3>App Version</h3>
+ * <p>By default your tests are executed with the active version of the app (it
+ * is usually the last uploaded version). This is no longer true when you set
+ * the app version manually.
+ * <p>You can manually set the app version that is used by the suite manually
+ * at the Sauce Labs website or you can use the {@code RdcAppiumSuite} runner.
+ * It updates the app version when you set the element
+ * {@link Rdc#appId() appId} of the {@code @Rdc} annotation or if you set an
+ * environment variable {@code "APP_ID"}. The environment variable takes
+ * precedence over the annotation.
  *
  * <h3>Timeout</h3>
  * <p>The timeout for each test is 60 minutes by default. You can change the
