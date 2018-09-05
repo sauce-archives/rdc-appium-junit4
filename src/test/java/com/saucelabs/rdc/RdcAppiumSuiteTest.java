@@ -363,6 +363,13 @@ public class RdcAppiumSuiteTest {
 			systemErr.getLogWithNormalizedLineSeparator());
 	}
 
+	@Test
+	public void runsLocallyIfFlagIsSetInRdcAnnotation() {
+		Result result = JUnitCore.runClasses(TestClassWithLocallyFlag.class);
+
+		assertNoUnexpectedException(result);
+	}
+
 	private void serverSendsResponse(int status) {
 		saucelabsServer.stubFor(
 			put(anyUrl()).willReturn(aResponse().withStatus(status)));
@@ -504,6 +511,12 @@ public class RdcAppiumSuiteTest {
 
 		@Before
 		public void setup() {
+			//We configure capabilities here because this is part of every real
+			//test and we want to have failing tests if it does not work.
+			DesiredCapabilities capabilities = new DesiredCapabilities();
+			capabilities.setCapability(RdcCapabilities.API_KEY, watcher.getApiKey());
+			capabilities.setCapability(RdcCapabilities.TEST_REPORT_ID, watcher.getTestReportId());
+
 			if (setWebDriver) {
 				watcher.setRemoteWebDriver(webDriver);
 			}
@@ -532,6 +545,12 @@ public class RdcAppiumSuiteTest {
 
 		@Before
 		public void setup() {
+			//We configure capabilities here because this is part of every real
+			//test and we want to have failing tests if it does not work.
+			DesiredCapabilities capabilities = new DesiredCapabilities();
+			capabilities.setCapability(RdcCapabilities.API_KEY, watcher.getApiKey());
+			capabilities.setCapability(RdcCapabilities.TEST_REPORT_ID, watcher.getTestReportId());
+
 			if (setWebDriver) {
 				watcher.setRemoteWebDriver(webDriver);
 			}
@@ -545,6 +564,34 @@ public class RdcAppiumSuiteTest {
 		@Test
 		public void secondTest() {
 			test.run();
+		}
+	}
+
+	@RunWith(RdcAppiumSuite.class)
+	@Rdc(suiteId = 1, testLocally = true)
+	public static class TestClassWithLocallyFlag {
+		@Rule
+		public RdcAppiumSuiteWatcher watcher = new RdcAppiumSuiteWatcher();
+
+		static final RemoteWebDriver webDriver = mock(RemoteWebDriver.class);
+
+		@Before
+		public void setup() {
+			//We configure capabilities here because this is part of every real
+			//test and we want to have failing tests if it does not work.
+			DesiredCapabilities capabilities = new DesiredCapabilities();
+			capabilities.setCapability(RdcCapabilities.API_KEY, watcher.getApiKey());
+			capabilities.setCapability(RdcCapabilities.TEST_REPORT_ID, watcher.getTestReportId());
+
+			watcher.setRemoteWebDriver(webDriver);
+		}
+
+		@Test
+		public void firstTest() {
+		}
+
+		@Test
+		public void secondTest() {
 		}
 	}
 }

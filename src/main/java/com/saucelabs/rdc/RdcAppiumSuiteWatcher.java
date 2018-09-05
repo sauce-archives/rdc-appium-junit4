@@ -140,16 +140,22 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 
 	/**
 	 * Returns the ID of the Sauce Labs' test report of this test. This ID has
-	 * to be sent as part of {@code DesiredCapabilities}.
+	 * to be sent as part of {@code DesiredCapabilities}. It returns
+	 * {@code null} when the test runs locally.
 	 * <pre>capabilities.setCapability({@link RdcCapabilities#TEST_REPORT_ID}, watcher.getTestReportId());</pre>
-	 * @return the ID of the Sauce Labs' test report of this test
+	 * @return the ID of the Sauce Labs' test report of this test or
+	 * {@code null} when the test runs locally.
 	 */
 	public String getTestReportId() {
-		OptionalInt id = reporter.suiteReport().getTestReportId(test);
-		if (id.isPresent()) {
-			return Integer.toString(id.getAsInt());
+		if (isLocalTest) {
+			return null;
 		} else {
-			throw new IllegalStateException("test report not present");
+			OptionalInt id = reporter.suiteReport().getTestReportId(test);
+			if (id.isPresent()) {
+				return Integer.toString(id.getAsInt());
+			} else {
+				throw new IllegalStateException("test report not present");
+			}
 		}
 	}
 
