@@ -140,7 +140,6 @@ public class RdcAppiumSuiteTest {
 	}
 
 	@Test
-	@Ignore("bug")
 	public void appIdIsUpdatedWhenPresentAsEnvironmentVariable() {
 		environmentVariables.set("APP_ID", "798697");
 		serverSendsResponse(

@@ -29,8 +29,10 @@ public class AppiumReportResource {
 				.path("suites").path(Long.toString(suiteId))
 				.path("reports")
 				.path("start");
-
-		appId.ifPresent(id -> target.queryParam("appId", id));
+		if (appId.isPresent()) {
+			String appIdAsString = Long.toString(appId.getAsLong());
+			target = target.queryParam("appId", appIdAsString);
+		}
 
 		return target
 				.request(APPLICATION_JSON_TYPE)
