@@ -210,13 +210,11 @@ public class RdcAppiumSuite extends Suite {
 
 	@Override
 	public void run(RunNotifier notifier) {
-		Set<RdcTest> tests = getTests(getDescription());
-
 		if (isTestingLocally) {
 			super.run(notifier);
 		} else {
 			try {
-				suiteReport = startAppiumSuite(tests);
+				startAppiumSuite();
 				try {
 					super.run(notifier);
 				} finally {
@@ -228,7 +226,8 @@ public class RdcAppiumSuite extends Suite {
 		}
 	}
 
-	private SuiteReport startAppiumSuite(Set<RdcTest> tests) {
+	private void startAppiumSuite() {
+		Set<RdcTest> tests = getTests(getDescription());
 		WebTarget target = client
 			.path("suites").path(Long.toString(suiteId))
 			.path("reports")
@@ -238,7 +237,7 @@ public class RdcAppiumSuite extends Suite {
 			target = target.queryParam("appId", appIdAsString);
 		}
 
-		return target
+		suiteReport = target
 			.request(APPLICATION_JSON_TYPE)
 			.post(Entity.json(tests), SuiteReport.class);
 	}
