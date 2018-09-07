@@ -13,7 +13,7 @@
     <version>2.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>RDC Appium Junit4</name>
+    <name>RDC Appium JUnit 4</name>
     <description>Library for running Appium test suites and updating test status on Sauce Labs Real Device Cloud (RDC)</description>
     <url>https://github.com/saucelabs/rdc-appium-junit4</url>
     <licenses>

@@ -10,13 +10,13 @@ RDC Appium Support for JUnit 4 is an open source library for running tests again
 
 **Note** that this library is not needed for running tests against Sauce Labs Real Device Cloud. It is only for the above mentioned features.
 
-RDC Appium Support for Junit 4 is published under the
+RDC Appium Support for JUnit 4 is published under the
 [Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 It requires at least Java 8.
 
 ## Installation
 
-RDC Appium Support for Junit 4 is available on
+RDC Appium Support for JUnit 4 is available on
 [Maven Central](https://search.maven.org/search?q=g:com.saucelabs%20AND%20a:rdc-appium-junit4).
 
 ```xml
