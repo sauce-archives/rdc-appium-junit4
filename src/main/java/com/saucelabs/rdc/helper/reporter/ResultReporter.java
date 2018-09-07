@@ -1,15 +1,16 @@
 package com.saucelabs.rdc.helper.reporter;
 
 import com.saucelabs.rdc.helper.RestClient;
-import com.saucelabs.rdc.resource.AppiumSessionResource;
-import org.openqa.selenium.OutputType;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 import java.net.URL;
 
 import static com.saucelabs.rdc.RdcCapabilities.API_KEY;
+import static java.util.Collections.singletonMap;
 import static java.util.Objects.requireNonNull;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 
 public class ResultReporter {
 
@@ -22,8 +23,7 @@ public class ResultReporter {
 	public void createSuiteReportAndTestReport(boolean passed, URL apiUrl) {
 		requireNonNull(webDriver, "The WebDriver instance is not set.");
 		try (RestClient client = createClient(apiUrl)) {
-			AppiumSessionResource appiumSessionResource = new AppiumSessionResource(client);
-			Response response = appiumSessionResource.updateTestReportStatus(webDriver.getSessionId().toString(), passed);
+			Response response = updateTestReportStatus(client, webDriver.getSessionId().toString(), passed);
 			if (response.getStatus() != 204) {
 				System.err.println("Test report status might not be updated on Sauce Labs RDC (TestObject). Status: " + response.getStatus());
 			}
@@ -36,5 +36,14 @@ public class ResultReporter {
 			.withToken((String) webDriver.getCapabilities().getCapability(API_KEY))
 			.path("/rest/v2/appium")
 			.build();
+	}
+
+	private Response updateTestReportStatus(
+		RestClient client, String sessionId, boolean passed) {
+		return client
+			.path("session").path(sessionId)
+			.path("test")
+			.request(APPLICATION_JSON_TYPE)
+			.put(Entity.json(singletonMap("passed", passed)));
 	}
 }

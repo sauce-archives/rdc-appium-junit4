@@ -5,10 +5,6 @@
         <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE"/>
     </Match>
     <Match>
-        <Class name="com.saucelabs.rdc.resource.AppiumSuiteResource$1"/>
-        <Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON"/>
-    </Match>
-    <Match>
         <Class name="com.saucelabs.rdc.helper.reporter.ResultReporter"/>
         <Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
     </Match>

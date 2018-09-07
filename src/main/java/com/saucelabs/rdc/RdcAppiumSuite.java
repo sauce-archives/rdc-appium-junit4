@@ -1,13 +1,12 @@
 package com.saucelabs.rdc;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.saucelabs.rdc.helper.RdcEnvironmentVariables;
 import com.saucelabs.rdc.helper.RdcTestParser;
 import com.saucelabs.rdc.helper.RestClient;
 import com.saucelabs.rdc.model.DataCenterSuite;
 import com.saucelabs.rdc.model.RdcTest;
 import com.saucelabs.rdc.model.SuiteReport;
-import com.saucelabs.rdc.resource.AppiumReportResource;
-import com.saucelabs.rdc.resource.AppiumSuiteResource;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
@@ -18,6 +17,9 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.RunnerScheduler;
 
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
@@ -28,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 
 /**
  * {@code RdcAppiumSuite} is a JUnit runner that runs your tests for an Appium
@@ -102,6 +105,9 @@ import static java.util.Objects.requireNonNull;
  */
 public class RdcAppiumSuite extends Suite {
 	private static final List<Runner> NO_RUNNERS = emptyList();
+	private static final GenericType<Set<DataCenterSuite>> SET_OF_DATA_CENTER_SUITES
+		= new GenericType<>(
+			new TypeReference<Set<DataCenterSuite>>() {}.getType());
 	private final List<Runner> perDeviceRunners;
 	private RestClient client;
 
@@ -209,18 +215,41 @@ public class RdcAppiumSuite extends Suite {
 		if (isTestingLocally) {
 			super.run(notifier);
 		} else {
-			AppiumReportResource appiumReportResource = new AppiumReportResource(client);
 			try {
-				suiteReport = appiumReportResource.startAppiumSuite(suiteId, appId, tests);
+				suiteReport = startAppiumSuite(tests);
 				try {
 					super.run(notifier);
 				} finally {
-					appiumReportResource.finishAppiumSuite(suiteId, suiteReport.getId());
+					finishAppiumSuite();
 				}
 			} finally {
 				client.close();
 			}
 		}
+	}
+
+	private SuiteReport startAppiumSuite(Set<RdcTest> tests) {
+		WebTarget target = client
+			.path("suites").path(Long.toString(suiteId))
+			.path("reports")
+			.path("start");
+		if (appId.isPresent()) {
+			String appIdAsString = Long.toString(appId.getAsLong());
+			target = target.queryParam("appId", appIdAsString);
+		}
+
+		return target
+			.request(APPLICATION_JSON_TYPE)
+			.post(Entity.json(tests), SuiteReport.class);
+	}
+
+	private void finishAppiumSuite() {
+		client
+			.path("suites").path(Long.toString(suiteId))
+			.path("reports").path(Long.toString(suiteReport.getId()))
+			.path("finish")
+			.request(APPLICATION_JSON_TYPE)
+			.put(Entity.json("ignored"), Map.class);
 	}
 
 	protected List<Runner> getChildren() {
@@ -253,8 +282,11 @@ public class RdcAppiumSuite extends Suite {
 	}
 
 	private Set<DataCenterSuite> getDataCenterSuites() {
-		AppiumSuiteResource suiteReportResource = new AppiumSuiteResource(client);
-		return suiteReportResource.readDeviceDescriptorIds(suiteId);
+		return client
+			.path("suites").path(Long.toString(suiteId))
+			.path("deviceIds")
+			.request(APPLICATION_JSON_TYPE)
+			.get(SET_OF_DATA_CENTER_SUITES);
 	}
 
 	protected static class ThreadPoolScheduler implements RunnerScheduler {

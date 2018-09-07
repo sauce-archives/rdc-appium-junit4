@@ -3,9 +3,13 @@ package com.saucelabs.rdc.helper.reporter;
 import com.saucelabs.rdc.helper.RestClient;
 import com.saucelabs.rdc.model.RdcTest;
 import com.saucelabs.rdc.model.SuiteReport;
-import com.saucelabs.rdc.resource.AppiumReportResource;
 
+import javax.ws.rs.client.Entity;
 import java.net.URL;
+import java.util.Map;
+
+import static java.util.Collections.singletonMap;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 
 public class SuiteReporter extends ResultReporter {
 
@@ -28,8 +32,13 @@ public class SuiteReporter extends ResultReporter {
 	private void updateSuiteReport(SuiteReport suiteReport, RdcTest test, boolean passed, URL apiUrl) {
 		int testReportId = suiteReport.getTestReportId(test);
 		try (RestClient client = createClient(apiUrl)) {
-			new AppiumReportResource(client)
-				.finishAppiumTestReport(suiteId, suiteReport.getId(), testReportId, passed);
+			client
+				.path("suites").path(Long.toString(suiteId))
+				.path("reports").path(Long.toString(suiteReport.getId()))
+				.path("results").path(Integer.toString(testReportId))
+				.path("finish")
+				.request(APPLICATION_JSON_TYPE)
+				.put(Entity.json(singletonMap("passed", passed)), Map.class);
 		}
 	}
 }
