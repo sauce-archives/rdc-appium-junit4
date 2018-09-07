@@ -96,6 +96,18 @@ public class RdcAppiumSuiteWatcherTest {
 
 ## Release Guide
 
+Travis CI deploys a release to Maven Central for each commit to master. Usually
+these are snapshot releases. If you want to create a new full release then
+please execute the following steps.
+
+* Select a new version according to the
+  [Semantic Versioning 2.0.0 Standard](http://semver.org/).
+* Set the new version in `pom.xml` and in the `Installation` section of
+  this readme.
+* Commit the modified `pom.xml` and `README.md`.
+* Push/merge to master so that Travis CI deploys the release.
+* Add a tag for the release: `git tag rdc-appium-junit4-X.X.X`
+
 #### Generate GPG keys
 
 This step is not needed to be done anymore since we already have keys.
