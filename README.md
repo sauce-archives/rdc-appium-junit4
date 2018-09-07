@@ -46,7 +46,7 @@ public class RdcTestResultWatcherTest {
 		capabilities.setCapability(RdcCapabilities.API_KEY, "Your project API key");
 
 		// Initializing Appium driver and setting the watcher
-		driver = new AndroidDriver(RdcEndpoints.EU_ENDPOINT, capabilities);
+		driver = new AndroidDriver(RdcDataCenter.EU, capabilities);
 		watcher.setRemoteWebDriver(driver);
 	}
 
