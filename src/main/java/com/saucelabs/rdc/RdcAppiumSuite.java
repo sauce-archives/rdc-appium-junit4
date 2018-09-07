@@ -20,6 +20,8 @@ import org.junit.runners.model.RunnerScheduler;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
@@ -239,6 +241,7 @@ public class RdcAppiumSuite extends Suite {
 
 		suiteReport = target
 			.request(APPLICATION_JSON_TYPE)
+			.header("RDC-Appium-JUnit4-Version", version())
 			.post(Entity.json(tests), SuiteReport.class);
 	}
 
@@ -248,6 +251,7 @@ public class RdcAppiumSuite extends Suite {
 			.path("reports").path(Long.toString(suiteReport.getId()))
 			.path("finish")
 			.request(APPLICATION_JSON_TYPE)
+			.header("RDC-Appium-JUnit4-Version", version())
 			.put(Entity.json("ignored"), Map.class);
 	}
 
@@ -280,11 +284,23 @@ public class RdcAppiumSuite extends Suite {
 		}
 	}
 
+	private String version() {
+		try (InputStream stream =
+				 RdcAppiumSuite.class.getResourceAsStream("/version.properties")) {
+			Properties properties = new Properties();
+			properties.load(stream);
+			return properties.getProperty("version");
+		} catch (IOException e) {
+			return "no-version-available";
+		}
+	}
+
 	private Set<DataCenterSuite> getDataCenterSuites() {
 		return client
 			.path("suites").path(Long.toString(suiteId))
 			.path("deviceIds")
 			.request(APPLICATION_JSON_TYPE)
+			.header("RDC-Appium-JUnit4-Version", version())
 			.get(SET_OF_DATA_CENTER_SUITES);
 	}
 

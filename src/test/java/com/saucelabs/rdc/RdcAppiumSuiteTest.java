@@ -363,6 +363,22 @@ public class RdcAppiumSuiteTest {
 	}
 
 	@Test
+	public void libraryVersionIsSentWithEachRequest() {
+		serverSendsResponse(
+			"[{\"dataCenterID\":\"dummy id\","
+				+ "\"dataCenterURL\":\"http://dummy-url\","
+				+ "\"deviceIds\":[\"first-device\", \"second-device\", \"third-device\"]}]");
+		serverSendsSuiteReport();
+		serverAcceptsResult();
+		wireMockServerIsApiServer();
+		TestClass.setWebDriver = true;
+
+		runTest();
+
+		saucelabsServer.assertLibraryVersionIsSentWithEachRequest();
+	}
+
+	@Test
 	public void runsLocallyIfFlagIsSetInRdcAnnotation() {
 		Result result = JUnitCore.runClasses(TestClassWithLocallyFlag.class);
 

@@ -38,6 +38,7 @@ public class SuiteReporter extends ResultReporter {
 				.path("results").path(Integer.toString(testReportId))
 				.path("finish")
 				.request(APPLICATION_JSON_TYPE)
+				.header("RDC-Appium-JUnit4-Version", version())
 				.put(Entity.json(singletonMap("passed", passed)), Map.class);
 		}
 	}

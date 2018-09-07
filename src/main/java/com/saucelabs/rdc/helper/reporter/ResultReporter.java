@@ -5,7 +5,10 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.util.Properties;
 
 import static com.saucelabs.rdc.RdcCapabilities.API_KEY;
 import static java.util.Collections.singletonMap;
@@ -44,6 +47,18 @@ public class ResultReporter {
 			.path("session").path(sessionId)
 			.path("test")
 			.request(APPLICATION_JSON_TYPE)
+			.header("RDC-Appium-JUnit4-Version", version())
 			.put(Entity.json(singletonMap("passed", passed)));
+	}
+
+	String version() {
+		try (InputStream stream =
+				 ResultReporter.class.getResourceAsStream("/version.properties")) {
+			Properties properties = new Properties();
+			properties.load(stream);
+			return properties.getProperty("version");
+		} catch (IOException e) {
+			return "no-version-available";
+		}
 	}
 }

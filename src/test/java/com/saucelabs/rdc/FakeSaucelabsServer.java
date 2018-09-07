@@ -26,10 +26,15 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
+import static com.github.tomakehurst.wiremock.matching.RequestPatternBuilder.allRequests;
+import static java.util.stream.Collectors.toSet;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 class FakeSaucelabsServer implements MethodRule {
 
@@ -39,6 +44,19 @@ class FakeSaucelabsServer implements MethodRule {
 	@Override
 	public Statement apply(Statement base, FrameworkMethod method, Object target) {
 		return wireMockRule.apply(base, method, target);
+	}
+
+	void assertLibraryVersionIsSentWithEachRequest() {
+		Set<String> versions = wireMockRule.findAll(allRequests())
+			.stream()
+			.map(request -> request.getHeader("RDC-Appium-JUnit4-Version"))
+			.collect(toSet());
+		assertEquals(1, versions.size());
+		String version = versions.iterator().next();
+		assertTrue(
+			"Header RDC-Appium-JUnit4-Version has value " + version
+				+ " which is not a valid version",
+			version.matches("\\d+\\.\\d+\\.\\d+(-SNAPSHOT)?"));
 	}
 
 	void addGetResponse(String path, int status, String messageBody) {

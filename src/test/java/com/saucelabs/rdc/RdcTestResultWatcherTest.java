@@ -11,7 +11,6 @@ import org.junit.runner.notification.Failure;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
-import org.mockito.Mockito;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -22,9 +21,7 @@ import java.util.Objects;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.saucelabs.rdc.RdcCapabilities.API_KEY;
 import static java.util.UUID.randomUUID;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.*;
@@ -243,6 +240,18 @@ public class RdcTestResultWatcherTest {
 		assertEquals(
 			"Failed to quit WebDriver. Caused by dummy reason\n",
 			systemErr.getLogWithNormalizedLineSeparator());
+	}
+
+	@Test
+	public void libraryVersionIsSentWithEachRequest() {
+		TestClass.setWebDriver = true;
+		serverSendsResponse(204);
+		webDriverHasArbitrarySessionId();
+		wireMockServerIsApiServer();
+
+		runTest();
+
+		saucelabsServer.assertLibraryVersionIsSentWithEachRequest();
 	}
 
 	private void serverSendsResponse(int status) {
