@@ -36,7 +36,7 @@ import static com.saucelabs.rdc.helper.RdcEnvironmentVariables.getApiEndpoint;
  *         DesiredCapabilities capabilities = new DesiredCapabilities();
  *         capabilities.setCapability({@link RdcCapabilities#API_KEY}, "Your project API key");
  *
- *         driver = new AndroidDriver({@link RdcDataCenter#EU}, capabilities);
+ *         driver = new AndroidDriver({@link RdcEndpoints#EU}, capabilities);
  *         watcher.setRemoteWebDriver(driver);
  *     }
  *
