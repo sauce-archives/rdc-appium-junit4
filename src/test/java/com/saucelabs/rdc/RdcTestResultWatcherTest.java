@@ -21,6 +21,7 @@ import java.util.Objects;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.saucelabs.rdc.RdcCapabilities.API_KEY;
 import static java.util.UUID.randomUUID;
+import static org.apache.commons.lang3.ArrayUtils.subarray;
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
@@ -180,9 +181,15 @@ public class RdcTestResultWatcherTest {
 
 		runTest();
 
-		assertTrue(
-			systemErr.getLogWithNormalizedLineSeparator()
-				.startsWith("Failed to update test report."));
+		String[] errorLog = systemErr.getLogWithNormalizedLineSeparator().split("\n");
+		assertArrayEquals(
+			new String[] {
+				"Failed to update test report. Caused by:",
+				"javax.ws.rs.ProcessingException: java.net.ConnectException: Connection refused (Connection refused)",
+				"\tat org.glassfish.jersey.client.internal.HttpUrlConnector.apply(HttpUrlConnector.java:284)",
+				"\tat org.glassfish.jersey.client.ClientRuntime.invoke(ClientRuntime.java:278)"
+			},
+			subarray(errorLog, 0, 4));
 	}
 
 	@Test

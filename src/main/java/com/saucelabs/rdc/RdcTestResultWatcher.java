@@ -6,6 +6,8 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import java.io.PrintStream;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -90,9 +92,8 @@ public class RdcTestResultWatcher implements TestRule {
 			try {
 				updateTestReport(passed);
 			} catch (Exception e) {
-				System.err.println(
-					"Failed to update test report. Caused by "
-						+ e.getLocalizedMessage());
+				System.err.println("Failed to update test report. Caused by:");
+				e.printStackTrace(System.err);
 			}
 		}
 	}
