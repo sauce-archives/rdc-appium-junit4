@@ -104,7 +104,7 @@ public class RdcTestResultWatcherTest {
 	}
 
 	@Test
-	public void isNotReportedAsPassed() {
+	public void isReportedAsNotPassed() {
 		assumeFalse(expectedToPass);
 
 		TestClass.setWebDriver = true;
