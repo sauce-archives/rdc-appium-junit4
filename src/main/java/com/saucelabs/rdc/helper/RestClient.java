@@ -16,6 +16,7 @@ import java.io.Closeable;
 import java.net.URI;
 import java.util.Optional;
 
+import static com.saucelabs.rdc.helper.RdcEnvironmentVariables.getApiEndpoint;
 import static java.util.Locale.US;
 
 public class RestClient implements Closeable {
@@ -40,8 +41,6 @@ public class RestClient implements Closeable {
 	public static final class Builder {
 
 		private Client client;
-		private String baseUrl;
-		private String path = "";
 		private String token = "";
 
 		public static Builder createClient() {
@@ -71,18 +70,8 @@ public class RestClient implements Closeable {
 			}
 		}
 
-		public Builder withEndpoint(String baseUrl) {
-			this.baseUrl = baseUrl;
-			return this;
-		}
-
 		public Builder withToken(String token) {
 			this.token = token;
-			return this;
-		}
-
-		public Builder path(String path) {
-			this.path = path;
 			return this;
 		}
 
@@ -91,6 +80,7 @@ public class RestClient implements Closeable {
 			ClientConfig config = new ClientConfig();
 			config.property(DISABLE_COOKIES, true);
 
+			String baseUrl = getApiEndpoint();
 			addProxyConfiguration(config, baseUrl);
 
 			client = ClientBuilder.newClient(config);
@@ -98,7 +88,7 @@ public class RestClient implements Closeable {
 			client.register(new LoggingFeature());
 			client.register(HttpAuthenticationFeature.basic(token, ""));
 
-			WebTarget target = client.target(baseUrl + path);
+			WebTarget target = client.target(baseUrl + "/rest/v2/appium");
 			return new RestClient(client, target);
 		}
 

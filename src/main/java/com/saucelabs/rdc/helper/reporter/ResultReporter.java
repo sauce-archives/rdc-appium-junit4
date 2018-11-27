@@ -7,7 +7,6 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.Properties;
 
 import static com.saucelabs.rdc.RdcCapabilities.API_KEY;
@@ -23,9 +22,9 @@ public class ResultReporter {
 		this.webDriver = webDriver;
 	}
 
-	public void createSuiteReportAndTestReport(boolean passed, URL apiUrl) {
+	public void createSuiteReportAndTestReport(boolean passed) {
 		requireNonNull(webDriver, "The WebDriver instance is not set.");
-		try (RestClient client = createClient(apiUrl)) {
+		try (RestClient client = createClient()) {
 			Response response = updateTestReportStatus(client, webDriver.getSessionId().toString(), passed);
 			if (response.getStatus() != 204) {
 				System.err.println("Test report status might not be updated on Sauce Labs RDC (TestObject). Status: " + response.getStatus());
@@ -33,11 +32,9 @@ public class ResultReporter {
 		}
 	}
 
-	RestClient createClient(URL apiUrl) {
+	RestClient createClient() {
 		return RestClient.Builder.createClient()
-			.withEndpoint(apiUrl.toString())
 			.withToken((String) webDriver.getCapabilities().getCapability(API_KEY))
-			.path("/rest/v2/appium")
 			.build();
 	}
 

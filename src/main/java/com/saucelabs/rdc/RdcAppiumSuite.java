@@ -22,14 +22,12 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static com.saucelabs.rdc.helper.RdcEnvironmentVariables.getApiEndpoint;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
@@ -128,20 +126,17 @@ public class RdcAppiumSuite extends Suite {
 
 		if (isTestingLocally) {
 			perDeviceRunners = singletonList(
-				new PerDeviceRunner(clazz, null, null, null, null));
+				new PerDeviceRunner(clazz, null, null, null));
 		} else {
 			apiKey = getApiKey(rdcAnnotation);
 			suiteId = getSuiteId(rdcAnnotation);
 			appId = getAppId(rdcAnnotation);
-			String apiEndpoint = getApiEndpoint();
 
 			client = RestClient.Builder.createClient()
-					.withEndpoint(apiEndpoint)
-					.path("/rest/v2/appium")
 					.withToken(apiKey)
 					.build();
 
-			perDeviceRunners = createRunners(clazz, apiEndpoint);
+			perDeviceRunners = createRunners(clazz);
 		}
 		this.setScheduler(new ThreadPoolScheduler(perDeviceRunners.size(), getTimeout(rdcAnnotation), getTimeoutUnit(rdcAnnotation)));
 	}
@@ -255,14 +250,13 @@ public class RdcAppiumSuite extends Suite {
 		return perDeviceRunners;
 	}
 
-	private List<Runner> createRunners(Class<?> clazz, String apiEndpoint) throws InitializationError {
-		URL apiUrl = url(apiEndpoint);
+	private List<Runner> createRunners(Class<?> clazz) throws InitializationError {
 		List<Runner> runners = new LinkedList<>();
 		for (DataCenterSuite dataCenterSuite : getDataCenterSuites()) {
 			URL appiumUrl = dataCenterSuite.getDataCenterUrl();
 			String dataCenterId = dataCenterSuite.dataCenterId;
 			for (String deviceId : dataCenterSuite.getDeviceDescriptorIds()) {
-				runners.add(new PerDeviceRunner(clazz, deviceId, dataCenterId, appiumUrl, apiUrl));
+				runners.add(new PerDeviceRunner(clazz, deviceId, dataCenterId, appiumUrl));
 			}
 		}
 
@@ -270,14 +264,6 @@ public class RdcAppiumSuite extends Suite {
 			throw new RuntimeException("No devices were specified for this suite");
 		}
 		return runners;
-	}
-
-	private URL url(String spec) {
-		try {
-			return new URL(spec);
-		} catch (MalformedURLException e) {
-			throw new RuntimeException("Failed to create URL for endpoint.", e);
-		}
 	}
 
 	private String version() {
@@ -336,14 +322,12 @@ public class RdcAppiumSuite extends Suite {
 		private final String deviceId;
 		private final String dataCenterId;
 		private final URL appiumUrl;
-		private final URL apiUrl;
 
-		public PerDeviceRunner(Class<?> clazz, String deviceId, String dataCenterId, URL appiumUrl, URL apiUrl) throws InitializationError {
+		public PerDeviceRunner(Class<?> clazz, String deviceId, String dataCenterId, URL appiumUrl) throws InitializationError {
 			super(clazz);
 			this.deviceId = deviceId;
 			this.dataCenterId = dataCenterId;
 			this.appiumUrl = appiumUrl;
-			this.apiUrl = apiUrl;
 		}
 
 		@Override
@@ -364,7 +348,6 @@ public class RdcAppiumSuite extends Suite {
 				if (rule instanceof RdcAppiumSuiteWatcher) {
 					RdcAppiumSuiteWatcher watcher = (RdcAppiumSuiteWatcher) rule;
 					watcher.apiKey = apiKey;
-					watcher.apiUrl = apiUrl;
 					watcher.appiumUrl = appiumUrl;
 					watcher.isLocalTest = isTestingLocally;
 					watcher.suiteId = suiteId;

@@ -66,7 +66,6 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 	private RdcTest test;
 	boolean isLocalTest;
 	URL appiumUrl;
-	URL apiUrl;
 	long suiteId;
 	SuiteReport suiteReport;
 	private RemoteWebDriver webDriver;
@@ -117,7 +116,7 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 		RdcTest test = RdcTestParser.from(description);
 		SuiteReporter reporter = new SuiteReporter(suiteId, suiteReport);
 		reporter.setRemoteWebDriver(webDriver);
-		reporter.reportResult(passed, test, apiUrl);
+		reporter.reportResult(passed, test);
 	}
 
 	private void safeQuitWebDriver() {

@@ -21,17 +21,17 @@ public class SuiteReporter extends ResultReporter {
 		this.suiteReport = suiteReport;
 	}
 
-	public void reportResult(boolean passed, RdcTest test, URL apiUrl) {
+	public void reportResult(boolean passed, RdcTest test) {
 		if (suiteReport == null) {
-			createSuiteReportAndTestReport(passed, apiUrl);
+			createSuiteReportAndTestReport(passed);
 		} else {
-			updateSuiteReport(suiteReport, test, passed, apiUrl);
+			updateSuiteReport(suiteReport, test, passed);
 		}
 	}
 
-	private void updateSuiteReport(SuiteReport suiteReport, RdcTest test, boolean passed, URL apiUrl) {
+	private void updateSuiteReport(SuiteReport suiteReport, RdcTest test, boolean passed) {
 		int testReportId = suiteReport.getTestReportId(test);
-		try (RestClient client = createClient(apiUrl)) {
+		try (RestClient client = createClient()) {
 			client
 				.path("suites").path(Long.toString(suiteId))
 				.path("reports").path(Long.toString(suiteReport.getId()))

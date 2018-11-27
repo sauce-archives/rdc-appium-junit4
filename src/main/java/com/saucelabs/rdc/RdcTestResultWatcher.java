@@ -6,11 +6,6 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import static com.saucelabs.rdc.helper.RdcEnvironmentVariables.getApiEndpoint;
-
 /**
  * An {@code RdcTestResultWatcher} updates the result of a test at Sauce Labs.
  * <p>Sauce Labs stores data about each test that you are executing on its Real
@@ -96,14 +91,10 @@ public class RdcTestResultWatcher implements TestRule {
 		}
 	}
 
-	private void updateTestReport(boolean passed) throws MalformedURLException {
+	private void updateTestReport(boolean passed) {
 		ResultReporter reporter = new ResultReporter();
 		reporter.setRemoteWebDriver(webDriver);
-		reporter.createSuiteReportAndTestReport(passed, apiUrl());
-	}
-
-	private URL apiUrl() throws MalformedURLException {
-		return new URL(getApiEndpoint());
+		reporter.createSuiteReportAndTestReport(passed);
 	}
 
 	private void safeQuitWebDriver() {
