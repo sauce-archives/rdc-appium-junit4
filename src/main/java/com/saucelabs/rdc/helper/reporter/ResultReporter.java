@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import static com.saucelabs.rdc.RdcCapabilities.API_KEY;
+import static com.saucelabs.rdc.helper.RestClient.createClientWithApiToken;
 import static java.util.Collections.singletonMap;
 import static java.util.Objects.requireNonNull;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
@@ -33,9 +34,9 @@ public class ResultReporter {
 	}
 
 	RestClient createClient() {
-		return RestClient.Builder.createClient()
-			.withToken((String) webDriver.getCapabilities().getCapability(API_KEY))
-			.build();
+		String apiToken = (String) webDriver.getCapabilities()
+			.getCapability(API_KEY);
+		return createClientWithApiToken(apiToken);
 	}
 
 	private Response updateTestReportStatus(

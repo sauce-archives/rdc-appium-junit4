@@ -28,6 +28,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static com.saucelabs.rdc.helper.RestClient.createClientWithApiToken;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
@@ -132,9 +133,7 @@ public class RdcAppiumSuite extends Suite {
 			suiteId = getSuiteId(rdcAnnotation);
 			appId = getAppId(rdcAnnotation);
 
-			client = RestClient.Builder.createClient()
-					.withToken(apiKey)
-					.build();
+			client = createClientWithApiToken(apiKey);
 
 			perDeviceRunners = createRunners(clazz);
 		}
