@@ -6,8 +6,6 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-import java.io.PrintStream;
-import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 
