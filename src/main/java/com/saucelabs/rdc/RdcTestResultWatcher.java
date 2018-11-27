@@ -105,7 +105,7 @@ public class RdcTestResultWatcher implements TestRule {
 	}
 
 	private URL apiUrl() throws MalformedURLException {
-		return new URL(getApiEndpoint().orElse("https://app.testobject.com/api"));
+		return new URL(getApiEndpoint());
 	}
 
 	private void safeQuitWebDriver() {

@@ -23,8 +23,13 @@ public class RdcEnvironmentVariables {
 		return Optional.ofNullable(System.getenv(SUITE_ID)).map(Long::valueOf);
 	}
 
-	public static Optional<String> getApiEndpoint() {
-		return Optional.ofNullable(System.getenv(API_URL));
+	public static String getApiEndpoint() {
+		String apiUrl = System.getenv(API_URL);
+		if (apiUrl == null) {
+			return "https://app.testobject.com/api";
+		} else {
+			return apiUrl;
+		}
 	}
 
 	public static OptionalLong getAppId() {

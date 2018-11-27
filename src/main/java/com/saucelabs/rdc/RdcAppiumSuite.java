@@ -29,6 +29,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static com.saucelabs.rdc.helper.RdcEnvironmentVariables.getApiEndpoint;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
@@ -203,11 +204,6 @@ public class RdcAppiumSuite extends Suite {
 	private TimeUnit getTimeoutUnit(Rdc rdcAnnotation) {
 		return RdcEnvironmentVariables.getTimeoutUnit()
 				.orElse(rdcAnnotation.timeoutUnit());
-	}
-
-	private String getApiEndpoint() {
-		return RdcEnvironmentVariables.getApiEndpoint()
-				.orElse("https://app.testobject.com/api");
 	}
 
 	@Override
