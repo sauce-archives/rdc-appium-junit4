@@ -14,7 +14,6 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import java.io.Closeable;
 import java.net.URI;
-import java.util.Optional;
 
 import static com.saucelabs.rdc.helper.RdcEnvironmentVariables.getApiEndpoint;
 import static java.util.Locale.US;
@@ -50,21 +49,20 @@ public class RestClient implements Closeable {
 		private static void addProxyConfiguration(ClientConfig config, String baseUrl) {
 			String protocol = URI.create(baseUrl).getScheme().toLowerCase(US);
 
-			Optional<String> proxyHost = Optional.ofNullable(System.getProperty(protocol + ".proxyHost"));
-			if (!proxyHost.isPresent()) {
+			String proxyHost = System.getProperty(protocol + ".proxyHost");
+			if (proxyHost == null) {
 				return;
 			}
 
-			String host = proxyHost.get();
-			String port = Optional.ofNullable(System.getProperty(protocol + ".proxyPort")).orElse("8080");
-			String proxyProtocol = Optional.ofNullable(System.getProperty(protocol + ".proxyProtocol")).orElse("http");
-			String url = proxyProtocol + "://" + host + ":" + port;
+			String port = propertyOrDefault(protocol + ".proxyPort", "8080");
+			String proxyProtocol = propertyOrDefault(protocol + ".proxyProtocol", "http");
+			String url = proxyProtocol + "://" + proxyHost + ":" + port;
 			config.property(ClientProperties.PROXY_URI, url);
 
-			Optional<String> username = Optional.ofNullable(System.getProperty(protocol + ".proxyUser"));
-			Optional<String> password = Optional.ofNullable(System.getProperty(protocol + ".proxyPassword"));
-			if (username.isPresent() && password.isPresent()) {
-				UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(username.get(), password.get());
+			String username = System.getProperty(protocol + ".proxyUser");
+			String password = System.getProperty(protocol + ".proxyPassword");
+			if (username != null && password != null) {
+				UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(username, password);
 				CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 				credentialsProvider.setCredentials(AuthScope.ANY, credentials);
 			}
@@ -94,4 +92,8 @@ public class RestClient implements Closeable {
 
 	}
 
+	private static String propertyOrDefault(String name, String defaultValue) {
+		String value = System.getProperty(name);
+		return value == null ? defaultValue : value;
+	}
 }
