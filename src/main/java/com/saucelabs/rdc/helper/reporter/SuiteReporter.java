@@ -8,6 +8,7 @@ import javax.ws.rs.client.Entity;
 import java.net.URL;
 import java.util.Map;
 
+import static com.saucelabs.rdc.helper.RestClient.createClientWithApiToken;
 import static java.util.Collections.singletonMap;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 
@@ -21,17 +22,19 @@ public class SuiteReporter extends ResultReporter {
 		this.suiteReport = suiteReport;
 	}
 
-	public void reportResult(boolean passed, RdcTest test) {
+	public void reportResult(String apiToken, boolean passed, RdcTest test) {
 		if (suiteReport == null) {
 			createSuiteReportAndTestReport(passed);
 		} else {
-			updateSuiteReport(suiteReport, test, passed);
+			updateSuiteReport(apiToken, suiteReport, test, passed);
 		}
 	}
 
-	private void updateSuiteReport(SuiteReport suiteReport, RdcTest test, boolean passed) {
+	private void updateSuiteReport(
+		String apiToken, SuiteReport suiteReport, RdcTest test, boolean passed) {
+
 		int testReportId = suiteReport.getTestReportId(test);
-		try (RestClient client = createClient()) {
+		try (RestClient client = createClientWithApiToken(apiToken)) {
 			client
 				.path("suites").path(Long.toString(suiteId))
 				.path("reports").path(Long.toString(suiteReport.getId()))

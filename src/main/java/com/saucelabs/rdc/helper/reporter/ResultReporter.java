@@ -33,7 +33,7 @@ public class ResultReporter {
 		}
 	}
 
-	RestClient createClient() {
+	private RestClient createClient() {
 		String apiToken = (String) webDriver.getCapabilities()
 			.getCapability(API_KEY);
 		return createClientWithApiToken(apiToken);
