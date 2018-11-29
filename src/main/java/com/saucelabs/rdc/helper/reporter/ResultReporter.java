@@ -1,19 +1,13 @@
 package com.saucelabs.rdc.helper.reporter;
 
-import com.saucelabs.rdc.helper.RestClient;
+import com.saucelabs.rdc.helper.Request;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
 import static com.saucelabs.rdc.RdcCapabilities.API_KEY;
-import static com.saucelabs.rdc.helper.RestClient.createClientWithApiToken;
 import static java.util.Collections.singletonMap;
 import static java.util.Objects.requireNonNull;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 
 public class ResultReporter {
 
@@ -24,39 +18,22 @@ public class ResultReporter {
 	}
 
 	public void createSuiteReportAndTestReport(boolean passed) {
+		Response response = updateTestReportStatus(passed);
+		if (response.getStatus() != 204) {
+			System.err.println("Test report status might not be updated on Sauce Labs RDC (TestObject). Status: " + response.getStatus());
+		}
+	}
+
+	private Response updateTestReportStatus(boolean passed) {
 		requireNonNull(webDriver, "The WebDriver instance is not set.");
-		try (RestClient client = createClient()) {
-			Response response = updateTestReportStatus(client, webDriver.getSessionId().toString(), passed);
-			if (response.getStatus() != 204) {
-				System.err.println("Test report status might not be updated on Sauce Labs RDC (TestObject). Status: " + response.getStatus());
-			}
-		}
+		return new Request()
+			.apiToken(apiToken())
+			.path("session/" + webDriver.getSessionId() + "/test")
+			.put(singletonMap("passed", passed));
 	}
 
-	private RestClient createClient() {
-		String apiToken = (String) webDriver.getCapabilities()
-			.getCapability(API_KEY);
-		return createClientWithApiToken(apiToken);
-	}
-
-	private Response updateTestReportStatus(
-		RestClient client, String sessionId, boolean passed) {
-		return client
-			.path("session").path(sessionId)
-			.path("test")
-			.request(APPLICATION_JSON_TYPE)
-			.header("RDC-Appium-JUnit4-Version", version())
-			.put(Entity.json(singletonMap("passed", passed)));
-	}
-
-	String version() {
-		try (InputStream stream =
-				 ResultReporter.class.getResourceAsStream("/version.properties")) {
-			Properties properties = new Properties();
-			properties.load(stream);
-			return properties.getProperty("version");
-		} catch (IOException e) {
-			return "no-version-available";
-		}
+	private String apiToken() {
+		return (String) webDriver.getCapabilities()
+                .getCapability(API_KEY);
 	}
 }

@@ -3,7 +3,7 @@ package com.saucelabs.rdc;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.saucelabs.rdc.helper.RdcEnvironmentVariables;
 import com.saucelabs.rdc.helper.RdcTestParser;
-import com.saucelabs.rdc.helper.RestClient;
+import com.saucelabs.rdc.helper.Request;
 import com.saucelabs.rdc.model.DataCenterSuite;
 import com.saucelabs.rdc.model.RdcTest;
 import com.saucelabs.rdc.model.SuiteReport;
@@ -17,22 +17,16 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.RunnerScheduler;
 
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static com.saucelabs.rdc.helper.RestClient.createClientWithApiToken;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 
 /**
  * {@code RdcAppiumSuite} is a JUnit runner that runs your tests for an Appium
@@ -111,13 +105,12 @@ public class RdcAppiumSuite extends Suite {
 		= new GenericType<>(
 			new TypeReference<Set<DataCenterSuite>>() {}.getType());
 	private final List<Runner> perDeviceRunners;
-	private RestClient client;
 
 	private String apiKey;
 	private long suiteId;
 	private OptionalLong appId;
 	private boolean isTestingLocally;
-
+	private Request baseRequest;
 	private SuiteReport suiteReport;
 
 	public RdcAppiumSuite(Class<?> clazz) throws InitializationError {
@@ -133,7 +126,7 @@ public class RdcAppiumSuite extends Suite {
 			suiteId = getSuiteId(rdcAnnotation);
 			appId = getAppId(rdcAnnotation);
 
-			client = createClientWithApiToken(apiKey);
+			baseRequest = new Request().apiToken(apiKey);
 
 			perDeviceRunners = createRunners(clazz);
 		}
@@ -205,44 +198,29 @@ public class RdcAppiumSuite extends Suite {
 		if (isTestingLocally) {
 			super.run(notifier);
 		} else {
+			startAppiumSuite();
 			try {
-				startAppiumSuite();
-				try {
-					super.run(notifier);
-				} finally {
-					finishAppiumSuite();
-				}
+				super.run(notifier);
 			} finally {
-				client.close();
+				finishAppiumSuite();
 			}
 		}
 	}
 
 	private void startAppiumSuite() {
 		Set<RdcTest> tests = getTests(getDescription());
-		WebTarget target = client
-			.path("suites").path(Long.toString(suiteId))
-			.path("reports")
-			.path("start");
+		Request request = baseRequest
+			.path("suites/" + suiteId + "/reports/start");
 		if (appId.isPresent()) {
-			String appIdAsString = Long.toString(appId.getAsLong());
-			target = target.queryParam("appId", appIdAsString);
+			request = request.queryParam("appId", appId.getAsLong());
 		}
-
-		suiteReport = target
-			.request(APPLICATION_JSON_TYPE)
-			.header("RDC-Appium-JUnit4-Version", version())
-			.post(Entity.json(tests), SuiteReport.class);
+		suiteReport = request.post(tests, SuiteReport.class);
 	}
 
 	private void finishAppiumSuite() {
-		client
-			.path("suites").path(Long.toString(suiteId))
-			.path("reports").path(Long.toString(suiteReport.getId()))
-			.path("finish")
-			.request(APPLICATION_JSON_TYPE)
-			.header("RDC-Appium-JUnit4-Version", version())
-			.put(Entity.json("ignored"), Map.class);
+		baseRequest
+			.path("suites/" + suiteId + "/reports/" + suiteReport.getId() + "/finish")
+			.put("ignored");
 	}
 
 	protected List<Runner> getChildren() {
@@ -265,23 +243,9 @@ public class RdcAppiumSuite extends Suite {
 		return runners;
 	}
 
-	private String version() {
-		try (InputStream stream =
-				 RdcAppiumSuite.class.getResourceAsStream("/version.properties")) {
-			Properties properties = new Properties();
-			properties.load(stream);
-			return properties.getProperty("version");
-		} catch (IOException e) {
-			return "no-version-available";
-		}
-	}
-
 	private Set<DataCenterSuite> getDataCenterSuites() {
-		return client
-			.path("suites").path(Long.toString(suiteId))
-			.path("deviceIds")
-			.request(APPLICATION_JSON_TYPE)
-			.header("RDC-Appium-JUnit4-Version", version())
+		return baseRequest
+			.path("suites/" + suiteId + "/deviceIds")
 			.get(SET_OF_DATA_CENTER_SUITES);
 	}
 

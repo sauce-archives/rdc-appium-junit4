@@ -11,31 +11,11 @@ import org.glassfish.jersey.logging.LoggingFeature;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import java.io.Closeable;
 import java.net.URI;
 
-import static com.saucelabs.rdc.helper.RdcEnvironmentVariables.getApiEndpoint;
 import static java.util.Locale.US;
 
-public class RestClient implements Closeable {
-
-	private final Client client;
-	private final WebTarget target;
-
-	private RestClient(Client client, WebTarget target) {
-		this.client = client;
-		this.target = target;
-	}
-
-	public WebTarget path(String path) {
-		return target.path(path);
-	}
-
-	@Override
-	public void close() {
-		client.close();
-	}
+class RestClient {
 
 	private static void addProxyConfiguration(ClientConfig config, String baseUrl) {
 		String protocol = URI.create(baseUrl).getScheme().toLowerCase(US);
@@ -59,12 +39,11 @@ public class RestClient implements Closeable {
 		}
 	}
 
-	public static RestClient createClientWithApiToken(String token) {
+	static Client createClientWithApiToken(String token, String baseUrl) {
 		String DISABLE_COOKIES = "jersey.config.apache.client.handleCookies";
 		ClientConfig config = new ClientConfig();
 		config.property(DISABLE_COOKIES, true);
 
-		String baseUrl = getApiEndpoint();
 		addProxyConfiguration(config, baseUrl);
 
 		Client client = ClientBuilder.newClient(config);
@@ -72,8 +51,7 @@ public class RestClient implements Closeable {
 		client.register(new LoggingFeature());
 		client.register(HttpAuthenticationFeature.basic(token, ""));
 
-		WebTarget target = client.target(baseUrl + "/rest/v2/appium");
-		return new RestClient(client, target);
+		return client;
 	}
 
 	private static String propertyOrDefault(String name, String defaultValue) {
