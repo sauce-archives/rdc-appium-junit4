@@ -6,6 +6,8 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import static com.saucelabs.rdc.RdcCapabilities.API_KEY;
+
 /**
  * An {@code RdcTestResultWatcher} updates the result of a test at Sauce Labs.
  * <p>Sauce Labs stores data about each test that you are executing on its Real
@@ -94,7 +96,12 @@ public class RdcTestResultWatcher implements TestRule {
 	private void updateTestReport(boolean passed) {
 		ResultReporter reporter = new ResultReporter();
 		reporter.setRemoteWebDriver(webDriver);
-		reporter.createSuiteReportAndTestReport(passed);
+		reporter.createSuiteReportAndTestReport(passed, apiToken());
+	}
+
+	private String apiToken() {
+		return (String) webDriver.getCapabilities()
+			.getCapability(API_KEY);
 	}
 
 	private void safeQuitWebDriver() {

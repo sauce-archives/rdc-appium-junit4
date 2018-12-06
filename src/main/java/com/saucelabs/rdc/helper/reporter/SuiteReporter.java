@@ -18,7 +18,7 @@ public class SuiteReporter extends ResultReporter {
 
 	public void reportResult(String apiToken, boolean passed, RdcTest test) {
 		if (suiteReport == null) {
-			createSuiteReportAndTestReport(passed);
+			createSuiteReportAndTestReport(passed, apiToken);
 		} else {
 			updateSuiteReport(apiToken, suiteReport, test, passed);
 		}
