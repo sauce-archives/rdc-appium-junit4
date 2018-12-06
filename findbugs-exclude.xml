@@ -9,7 +9,7 @@
         <Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
     </Match>
     <Match>
-        <Class name="com.saucelabs.rdc.helper.reporter.ResultReporter"/>
+        <Class name="com.saucelabs.rdc.helper.reporter.SuiteReporter"/>
         <Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
     </Match>
 </FindBugsFilter>

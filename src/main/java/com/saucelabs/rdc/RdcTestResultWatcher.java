@@ -1,12 +1,13 @@
 package com.saucelabs.rdc;
 
-import com.saucelabs.rdc.helper.reporter.ResultReporter;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import static com.saucelabs.rdc.RdcCapabilities.API_KEY;
+import static com.saucelabs.rdc.helper.reporter.ResultReporter.createSuiteReportAndTestReport;
+import static java.util.Objects.requireNonNull;
 
 /**
  * An {@code RdcTestResultWatcher} updates the result of a test at Sauce Labs.
@@ -94,9 +95,8 @@ public class RdcTestResultWatcher implements TestRule {
 	}
 
 	private void updateTestReport(boolean passed) {
-		ResultReporter reporter = new ResultReporter();
-		reporter.setRemoteWebDriver(webDriver);
-		reporter.createSuiteReportAndTestReport(passed, apiToken());
+		requireNonNull(webDriver, "The WebDriver instance is not set.");
+		createSuiteReportAndTestReport(webDriver.getSessionId(), passed, apiToken());
 	}
 
 	private String apiToken() {
