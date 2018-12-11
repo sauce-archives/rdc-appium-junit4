@@ -121,8 +121,8 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 			createSuiteReportAndTestReport(webDriver.getSessionId(), passed, apiKey);
 		} else {
 			RdcTest test = RdcTestParser.from(description);
-			SuiteReporter reporter = new SuiteReporter(suiteId, suiteReport);
-			reporter.updateSuiteReport(test, passed, apiKey);
+			int testReportId = suiteReport.getTestReportId(test);
+			SuiteReporter.updateSuiteReport(suiteId, suiteReport.getId(), testReportId, passed, apiKey);
 		}
 	}
 
