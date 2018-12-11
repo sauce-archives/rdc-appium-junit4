@@ -1,9 +1,7 @@
 package com.saucelabs.rdc;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.saucelabs.rdc.helper.RdcEnvironmentVariables;
 import com.saucelabs.rdc.helper.RdcTestParser;
-import com.saucelabs.rdc.helper.Request;
 import com.saucelabs.rdc.model.DataCenterSuite;
 import com.saucelabs.rdc.model.RdcTest;
 import com.saucelabs.rdc.model.SuiteReport;
@@ -17,7 +15,6 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.RunnerScheduler;
 
-import javax.ws.rs.core.GenericType;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -101,16 +98,13 @@ import static java.util.Objects.requireNonNull;
  */
 public class RdcAppiumSuite extends Suite {
 	private static final List<Runner> NO_RUNNERS = emptyList();
-	private static final GenericType<Set<DataCenterSuite>> SET_OF_DATA_CENTER_SUITES
-		= new GenericType<>(
-			new TypeReference<Set<DataCenterSuite>>() {}.getType());
 	private final List<Runner> perDeviceRunners;
 
 	private String apiKey;
 	private long suiteId;
 	private OptionalLong appId;
 	private boolean isTestingLocally;
-	private Request baseRequest;
+	private SauceLabsApi sauceLabsApi;
 	private SuiteReport suiteReport;
 
 	public RdcAppiumSuite(Class<?> clazz) throws InitializationError {
@@ -126,7 +120,7 @@ public class RdcAppiumSuite extends Suite {
 			suiteId = getSuiteId(rdcAnnotation);
 			appId = getAppId(rdcAnnotation);
 
-			baseRequest = new Request().apiToken(apiKey);
+			sauceLabsApi = new SauceLabsApi(apiKey);
 
 			perDeviceRunners = createRunners(clazz);
 		}
@@ -209,18 +203,11 @@ public class RdcAppiumSuite extends Suite {
 
 	private void startAppiumSuite() {
 		Set<RdcTest> tests = getTests(getDescription());
-		Request request = baseRequest
-			.path("suites/" + suiteId + "/reports/start");
-		if (appId.isPresent()) {
-			request = request.queryParam("appId", appId.getAsLong());
-		}
-		suiteReport = request.post(tests, SuiteReport.class);
+		suiteReport = sauceLabsApi.startAppiumSuite(tests, suiteId, appId);
 	}
 
 	private void finishAppiumSuite() {
-		baseRequest
-			.path("suites/" + suiteId + "/reports/" + suiteReport.getId() + "/finish")
-			.put("ignored");
+		sauceLabsApi.finishAppiumSuite(suiteId, suiteReport.getId());
 	}
 
 	protected List<Runner> getChildren() {
@@ -244,9 +231,7 @@ public class RdcAppiumSuite extends Suite {
 	}
 
 	private Set<DataCenterSuite> getDataCenterSuites() {
-		return baseRequest
-			.path("suites/" + suiteId + "/deviceIds")
-			.get(SET_OF_DATA_CENTER_SUITES);
+		return sauceLabsApi.findDataCenterSuites(suiteId);
 	}
 
 	protected static class ThreadPoolScheduler implements RunnerScheduler {
