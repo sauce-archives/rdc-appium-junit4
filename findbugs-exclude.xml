@@ -5,11 +5,11 @@
         <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE"/>
     </Match>
     <Match>
-        <Class name="com.saucelabs.rdc.RdcTestResultWatcher"/>
+        <Class name="com.saucelabs.rdc.RdcAppiumSuiteWatcher"/>
         <Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
     </Match>
     <Match>
-        <Class name="com.saucelabs.rdc.helper.reporter.SuiteReporter"/>
+        <Class name="com.saucelabs.rdc.RdcTestResultWatcher"/>
         <Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
     </Match>
 </FindBugsFilter>

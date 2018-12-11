@@ -13,6 +13,9 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import static com.saucelabs.rdc.helper.reporter.ResultReporter.createSuiteReportAndTestReport;
+import static java.util.Objects.requireNonNull;
+
 /**
  * {@code RdcAppiumSuiteWatcher} updates the result of a test at Sauce Labs and
  * closes the {@code WebDriver} at the end of the test. It is designed for
@@ -113,10 +116,14 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 	}
 
 	private void updateTestReport(boolean passed, Description description) {
-		RdcTest test = RdcTestParser.from(description);
-		SuiteReporter reporter = new SuiteReporter(suiteId, suiteReport);
-		reporter.setRemoteWebDriver(webDriver);
-		reporter.reportResult(apiKey, passed, test);
+		if (suiteReport == null) {
+			requireNonNull(webDriver, "The WebDriver instance is not set.");
+			createSuiteReportAndTestReport(webDriver.getSessionId(), passed, apiKey);
+		} else {
+			RdcTest test = RdcTestParser.from(description);
+			SuiteReporter reporter = new SuiteReporter(suiteId, suiteReport);
+			reporter.updateSuiteReport(test, passed, apiKey);
+		}
 	}
 
 	private void safeQuitWebDriver() {
