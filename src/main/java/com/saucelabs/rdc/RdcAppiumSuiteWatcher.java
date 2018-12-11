@@ -1,7 +1,6 @@
 package com.saucelabs.rdc;
 
 import com.saucelabs.rdc.helper.RdcTestParser;
-import com.saucelabs.rdc.helper.reporter.SuiteReporter;
 import com.saucelabs.rdc.model.RdcTest;
 import com.saucelabs.rdc.model.SuiteReport;
 import org.junit.rules.TestRule;
@@ -13,7 +12,6 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import static com.saucelabs.rdc.helper.reporter.ResultReporter.createSuiteReportAndTestReport;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -116,13 +114,16 @@ public class RdcAppiumSuiteWatcher implements TestRule {
 	}
 
 	private void updateTestReport(boolean passed, Description description) {
+		SauceLabsApi sauceLabsApi = new SauceLabsApi(apiKey);
 		if (suiteReport == null) {
 			requireNonNull(webDriver, "The WebDriver instance is not set.");
-			createSuiteReportAndTestReport(webDriver.getSessionId(), passed, apiKey);
+			sauceLabsApi.updateTestReportStatus(
+				webDriver.getSessionId(), passed);
 		} else {
 			RdcTest test = RdcTestParser.from(description);
 			int testReportId = suiteReport.getTestReportId(test);
-			SuiteReporter.updateSuiteReport(suiteId, suiteReport.getId(), testReportId, passed, apiKey);
+			sauceLabsApi.updateTestReportStatus(
+				suiteId, suiteReport.getId(), testReportId, passed);
 		}
 	}
 

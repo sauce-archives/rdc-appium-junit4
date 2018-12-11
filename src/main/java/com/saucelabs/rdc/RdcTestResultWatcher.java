@@ -6,7 +6,6 @@ import org.junit.runners.model.Statement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import static com.saucelabs.rdc.RdcCapabilities.API_KEY;
-import static com.saucelabs.rdc.helper.reporter.ResultReporter.createSuiteReportAndTestReport;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -96,7 +95,8 @@ public class RdcTestResultWatcher implements TestRule {
 
 	private void updateTestReport(boolean passed) {
 		requireNonNull(webDriver, "The WebDriver instance is not set.");
-		createSuiteReportAndTestReport(webDriver.getSessionId(), passed, apiToken());
+		new SauceLabsApi(apiToken())
+			.updateTestReportStatus(webDriver.getSessionId(), passed);
 	}
 
 	private String apiToken() {
