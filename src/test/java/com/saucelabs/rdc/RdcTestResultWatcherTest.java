@@ -105,6 +105,20 @@ public class RdcTestResultWatcherTest {
 	}
 
 	@Test
+	public void isReportedAsPassedEvenWhenRemoteDriverQuitHasBeenCalled() {
+		assumeTrue(expectedToPass);
+
+		serverSendsResponse(204);
+		SessionId sessionId = randomSessionId();
+		webDriverHasSessionId(TestClassThatQuitsWebDriver.webDriver, sessionId);
+		wireMockServerIsApiServer();
+
+		runTestThatQuitsWebDriver();
+
+		assertReported(sessionId, "{\"passed\":true}");
+	}
+
+	@Test
 	public void isReportedAsNotPassed() {
 		assumeFalse(expectedToPass);
 
@@ -115,6 +129,20 @@ public class RdcTestResultWatcherTest {
 		wireMockServerIsApiServer();
 
 		runTest();
+
+		assertReported(sessionId, "{\"passed\":false}");
+	}
+
+	@Test
+	public void isReportedAsNotPassedEvenWhenRemoteDriverQuitHasBeenCalled() {
+		assumeFalse(expectedToPass);
+
+		serverSendsResponse(204);
+		SessionId sessionId = randomSessionId();
+		webDriverHasSessionId(TestClassThatQuitsWebDriver.webDriver, sessionId);
+		wireMockServerIsApiServer();
+
+		runTestThatQuitsWebDriver();
 
 		assertReported(sessionId, "{\"passed\":false}");
 	}
@@ -245,7 +273,11 @@ public class RdcTestResultWatcherTest {
 	}
 
 	private void webDriverHasSessionId(SessionId id) {
-		when(TestClass.webDriver.getSessionId())
+		webDriverHasSessionId(TestClass.webDriver, id);
+	}
+
+	private void webDriverHasSessionId(RemoteWebDriver webDriver, SessionId id) {
+		when(webDriver.getSessionId())
 			.thenReturn(id);
 	}
 
@@ -263,6 +295,13 @@ public class RdcTestResultWatcherTest {
 		when(TestClass.webDriver.getCapabilities())
 			.thenReturn(capabilitiesWithApiKey("dummy-api-key"));
 		return JUnitCore.runClasses(TestClass.class);
+	}
+
+	private Result runTestThatQuitsWebDriver() {
+		TestClassThatQuitsWebDriver.test = test;
+		when(TestClassThatQuitsWebDriver.webDriver.getCapabilities())
+			.thenReturn(capabilitiesWithApiKey("dummy-api-key"));
+		return JUnitCore.runClasses(TestClassThatQuitsWebDriver.class);
 	}
 
 	private Capabilities capabilitiesWithApiKey(String apiKey) {
@@ -308,6 +347,33 @@ public class RdcTestResultWatcherTest {
 		@Test
 		public void test() {
 			test.run();
+		}
+	}
+
+	public static class TestClassThatQuitsWebDriver {
+
+		@Rule
+		public RdcTestResultWatcher watcher = new RdcTestResultWatcher();
+
+		static final RemoteWebDriver webDriver = mock(RemoteWebDriver.class);
+
+		static Runnable test; //used to inject the test itself
+
+		@Before
+		public void setup() {
+			watcher.setRemoteWebDriver(webDriver);
+		}
+
+		@Test
+		public void test() {
+			test.run();
+		}
+
+		@After
+		public void quitWebDriver() {
+			//webDriver has no session id after webDriver.quit() has been called
+			when(webDriver.getSessionId())
+				.thenReturn(null);
 		}
 	}
 }

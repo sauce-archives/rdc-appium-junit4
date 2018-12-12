@@ -4,6 +4,7 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.SessionId;
 
 import static com.saucelabs.rdc.RdcCapabilities.API_KEY;
 
@@ -52,15 +53,19 @@ public class RdcTestResultWatcher implements TestRule {
 	private static final boolean PASSED = true;
 
 	private RemoteWebDriver webDriver;
+	private SessionId sessionId;
 
 	/**
 	 * Set the WebDriver. {@code RdcTestResultWatcher} needs to read the API key
-	 * and the session from the {@code AppiumDriver}.
+	 * and the session id from the {@code AppiumDriver}.
 	 * @param webDriver the WebDriver that is used for the test.
 	 * @since 1.0.0
 	 */
 	public void setRemoteWebDriver(RemoteWebDriver webDriver) {
 		this.webDriver = webDriver;
+		// We store the session id immediately because it is null after
+		// webDriver.quit() is called.
+		this.sessionId = webDriver.getSessionId();
 	}
 
 	@Override
@@ -94,7 +99,7 @@ public class RdcTestResultWatcher implements TestRule {
 
 	private void updateTestReport(boolean passed) {
 		new SauceLabsApi(apiToken())
-			.updateTestReportStatus(webDriver.getSessionId(), passed);
+			.updateTestReportStatus(sessionId, passed);
 	}
 
 	private String apiToken() {
