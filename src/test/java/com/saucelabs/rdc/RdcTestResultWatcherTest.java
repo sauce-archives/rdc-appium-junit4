@@ -95,12 +95,13 @@ public class RdcTestResultWatcherTest {
 
 		TestClass.setWebDriver = true;
 		serverSendsResponse(204);
-		webDriverHasArbitrarySessionId();
+		SessionId sessionId = randomSessionId();
+		webDriverHasSessionId(sessionId);
 		wireMockServerIsApiServer();
 
 		runTest();
 
-		assertEquals("{\"passed\":true}", saucelabsServer.bodyOfLastRequest());
+		assertReported(sessionId, "{\"passed\":true}");
 	}
 
 	@Test
@@ -109,41 +110,13 @@ public class RdcTestResultWatcherTest {
 
 		TestClass.setWebDriver = true;
 		serverSendsResponse(204);
-		webDriverHasArbitrarySessionId();
-		wireMockServerIsApiServer();
-
-		runTest();
-
-		assertEquals("{\"passed\":false}", saucelabsServer.bodyOfLastRequest());
-	}
-
-	@Test
-	public void isReportedToSessionsTestEndpoint() {
-		TestClass.setWebDriver = true;
-		serverSendsResponse(204);
 		SessionId sessionId = randomSessionId();
 		webDriverHasSessionId(sessionId);
 		wireMockServerIsApiServer();
 
 		runTest();
 
-		saucelabsServer.verify(
-			putRequestedFor(
-				urlEqualTo("/rest/v2/appium/session/" + sessionId + "/test")));
-	}
-
-	@Test
-	public void isReportedAsJsonDocument() {
-		TestClass.setWebDriver = true;
-		serverSendsResponse(204);
-		webDriverHasArbitrarySessionId();
-		wireMockServerIsApiServer();
-
-		runTest();
-
-		saucelabsServer.verify(
-			putRequestedFor(anyUrl())
-				.withHeader("Accept", equalTo("application/json")));
+		assertReported(sessionId, "{\"passed\":false}");
 	}
 
 	@Test
@@ -306,6 +279,13 @@ public class RdcTestResultWatcherTest {
 					"An unexpected exception was thrown.", exception);
 			}
 		}
+	}
+
+	private void assertReported(SessionId sessionId, String message) {
+		saucelabsServer.verify(
+			putRequestedFor(urlEqualTo("/rest/v2/appium/session/" + sessionId + "/test"))
+				.withHeader("Accept", equalTo("application/json"))
+				.withRequestBody(equalTo(message)));
 	}
 
 	public static class TestClass {
